@@ -1,6 +1,5 @@
 # CS2-AI-coaching
 AI coaching system 
-# CS2-AI-coaching
 
 ## Project Overview
 This project aims to build an AI coaching assistant for Counter-Strike 2 (CS2). Instead of taking over gameplay or directly controlling player actions, the system is designed to analyze the current game situation and provide context-aware recommendations that help players improve positioning and in-game decision-making.
