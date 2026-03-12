@@ -1,17 +1,18 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from typing import Dict, Tuple
+from typing import Dict, Optional
 
 
 REGIONS = ["A", "B", "MID"]
 LABELS = ["ROTATE_A", "ROTATE_B", "HOLD", "REPOSITION", "PLAY_SAFE"]
 
-
 @dataclass
 class Observation:
     time_left: int
     teammate_death_site: str  # "A", "B", "NONE"
-    place_probs: Dict[str, float]  # e.g. {"A":0.2,"B":0.7,"MID":0.1}
+    place_probs: Optional[Dict[str, float]] = None  # can be None
+    place_id: Optional[str] = None  # "A", "B", "MID" (top-1)
     smoke_A: bool = False
     smoke_B: bool = False
     saw_enemy_A: bool = False
@@ -26,6 +27,18 @@ def normalize(dist: Dict[str, float]) -> Dict[str, float]:
     return {k: max(v, 0.0) / s for k, v in dist.items()}
 
 
+def make_prior(obs: Observation) -> Dict[str, float]:
+    # prefer place_probs
+    if obs.place_probs is not None:
+        return dict(obs.place_probs)
+
+    # fallback: one-hot from place_id
+    if obs.place_id in REGIONS:
+        return {r: (1.0 if r == obs.place_id else 0.0) for r in REGIONS}
+
+    # fallback: uniform
+    return {r: 1.0 / len(REGIONS) for r in REGIONS}
+    
 def belief_update(obs: Observation) -> Dict[str, float]:
     """
     Rule-based belief update (v0).
