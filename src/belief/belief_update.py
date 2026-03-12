@@ -44,7 +44,7 @@ def belief_update(obs: Observation) -> Dict[str, float]:
     Rule-based belief update (v0).
     Uses VPR place_probs as a prior, then adjusts using teammate death + simple cues.
     """
-    belief = dict(obs.place_probs)
+    belief = make_prior(obs)
 
     # Strong evidence: saw enemy
     if obs.saw_enemy_A:
@@ -96,8 +96,8 @@ def run_once(obs_dict: Dict) -> Tuple[Dict[str, float], str]:
 
 
 if __name__ == "__main__":
-    # Toy demo (you can run this locally later)
-    example_obs = {
+    # Example 1: VPR provides probabilities
+    example_obs_1 = {
         "time_left": 22,
         "teammate_death_site": "B",
         "place_probs": {"A": 0.20, "B": 0.70, "MID": 0.10},
@@ -106,6 +106,16 @@ if __name__ == "__main__":
         "saw_enemy_A": False,
         "saw_enemy_B": False,
     }
-    belief, label = run_once(example_obs)
-    print("belief =", belief)
-    print("label  =", label)
+    belief, label = run_once(example_obs_1)
+    print("[probs] belief =", belief)
+    print("[probs] label  =", label)
+
+    # Example 2: VPR provides only top-1 place_id
+    example_obs_2 = {
+        "time_left": 22,
+        "teammate_death_site": "B",
+        "place_id": "B",
+    }
+    belief, label = run_once(example_obs_2)
+    print("[id] belief =", belief)
+    print("[id] label  =", label)
