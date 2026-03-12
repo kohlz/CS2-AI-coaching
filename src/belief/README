@@ -1,0 +1,8 @@
+# Belief / POMDP Layer
+
+This module maintains a belief state over coarse map regions and outputs a recommendation label.
+
+Input: observation dict (see `docs/observation-schema.md`)  
+Output: (belief distribution, label)
+
+The current implementation is a simple rule-based prototype (v0).
