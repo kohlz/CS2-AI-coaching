@@ -1,0 +1,4 @@
+demoparser2>=0.41.0
+pandas>=1.5.0
+numpy
+shapely
