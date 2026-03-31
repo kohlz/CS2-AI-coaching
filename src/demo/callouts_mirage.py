@@ -3,9 +3,9 @@ callouts_mirage.py
 
 Map XYZ game coordinates to named callout regions on de_mirage.
 
-Coordinate system (derived from demo data):
+Coordinate system (CS2, verified via in-game screenshots):
   - X-axis: negative = CT side (left), positive = T side (right)
-  - Y-axis: negative = B side (bottom), positive = A side (top)
+  - Y-axis: positive = B side (top of radar), negative = A side (bottom)
   - Z-axis: elevation (negative = ground level)
 
 Regions are defined as axis-aligned bounding boxes [x_min, x_max, y_min, y_max].
@@ -16,8 +16,10 @@ Usage
 -----
     from callouts_mirage import get_callout, get_zone
 
-    name = get_callout(-500, -2000)   # "B site"
-    zone = get_zone(-500, -2000)      # "B"
+    name = get_callout(-1969, 450)    # "B site"
+    zone = get_zone(-1969, 450)       # "B"
+    name = get_callout(-500, -2000)   # "A site"
+    zone = get_zone(-500, -2000)      # "A"
 """
 
 from __future__ import annotations
@@ -29,25 +31,25 @@ from typing import Optional
 # ---------------------------------------------------------------------------
 
 CALLOUTS: list[tuple[str, tuple[float, float, float, float]]] = [
-    # ── A site area ──────────────────────────────────────────────────
-    ("A site",          (-2600, -1600, 50, 650)),
-    ("palace",          (-2200, -200, 650, 900)),
-    ("A ramp",          (-1600, -900, 50, 500)),
-    ("A tetris",        (-1700, -1300, -200, 50)),
-    ("jungle",          (-2400, -1300, -750, 50)),
+    # ── B site area (positive Y, upper portion of radar) ─────────────
+    ("B site",          (-2600, -1600, 50, 650)),
+    ("B apartments",    (-2200, -200, 650, 900)),
+    ("B short",         (-1600, -900, 50, 500)),
+    ("bench",           (-1700, -1300, -200, 50)),
+    ("market",          (-2400, -1300, -750, 50)),
     ("connector",       (-1300, -700, -750, 100)),
-    ("stairs",          (-1300, -700, -900, -750)),
+    ("market door",     (-1300, -700, -900, -750)),
 
     # ── CT spawn + CT area ───────────────────────────────────────────
     ("CT spawn",        (-2100, -1200, -2300, -1600)),
 
-    # ── B site area ──────────────────────────────────────────────────
-    ("B site",          (-800, -100, -2500, -1850)),
-    ("B apartments",    (-150, 800, -2300, -1300)),
-    ("B short",         (-800, -200, -1850, -1200)),
-    ("market",          (-1200, -800, -2500, -1850)),
-    ("bench",           (-1200, -800, -1850, -1200)),
-    ("market door",     (-1200, -800, -1200, -900)),
+    # ── A site area (negative Y, lower portion of radar) ─────────────
+    ("A site",          (-800, -100, -2500, -1850)),
+    ("palace",          (-150, 800, -2300, -1300)),
+    ("A ramp",          (-800, -200, -1850, -1200)),
+    ("jungle",          (-1200, -800, -2500, -1850)),
+    ("stairs",          (-1200, -800, -1850, -1200)),
+    ("A tetris",        (-1200, -800, -1200, -900)),
 
     # ── Mid ──────────────────────────────────────────────────────────
     ("window",          (-1610, -900, -1600, -700)),
@@ -64,19 +66,19 @@ CALLOUTS: list[tuple[str, tuple[float, float, float, float]]] = [
 
 # Coarse zones for POMDP / HMM (5 high-level regions)
 ZONE_MAP: dict[str, str] = {
-    "A site": "A",
-    "A ramp": "A",
-    "palace": "A",
-    "A tetris": "A",
-    "jungle": "A",
-    "stairs": "A",
-
     "B site": "B",
     "B apartments": "B",
     "B short": "B",
+    "bench": "B",
     "market": "B",
     "market door": "B",
-    "bench": "B",
+
+    "A site": "A",
+    "palace": "A",
+    "A ramp": "A",
+    "jungle": "A",
+    "stairs": "A",
+    "A tetris": "A",
 
     "mid": "MID",
     "window": "MID",
@@ -144,8 +146,8 @@ if __name__ == "__main__":
     tests = [
         (1200, -100, "T spawn"),
         (-1700, -1900, "CT spawn"),
-        (-1969, 450, "A site"),
-        (-500, -2000, "B site"),
+        (-1969, 450, "B site"),
+        (-500, -2000, "A site"),
         (-200, -500, "mid"),
     ]
     for x, y, expected in tests:

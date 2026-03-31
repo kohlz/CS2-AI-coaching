@@ -1,0 +1,1247 @@
+{
+  "demo_file": "src/demo/260319mirage.dem",
+  "player_name": "a_Xun",
+  "map_name": "de_mirage",
+  "match_score": "T 13 - 7 CT",
+  "total_rounds": 20,
+  "overall_grade": "B",
+  "generation_time_sec": 5.13,
+  "economy": {
+    "total_rounds": 15,
+    "fresh_buy_rounds": 1,
+    "team_drop_rounds": 14,
+    "optimal_decisions": 14,
+    "fresh_buy_accuracy": 0.0,
+    "overall_accuracy": 0.9333333333333333,
+    "mistakes": 1,
+    "over_buys": 1,
+    "under_buys": 0,
+    "mistakes_vs_enemy_eco": 0,
+    "mistakes_vs_enemy_buy": 0,
+    "avg_wp_loss_per_mistake": -0.1815,
+    "grade": "A"
+  },
+  "engagement": {
+    "rounds": 20,
+    "kills": 16,
+    "deaths": 13,
+    "kd_ratio": 1.2307692307692308,
+    "adr": 92.8,
+    "opening_duels": 4,
+    "opening_kills": 1,
+    "opening_deaths": 3,
+    "opening_success_rate": 0.25,
+    "trade_opportunities": 51,
+    "successful_trades": 8,
+    "trade_rate": 0.1568627450980392,
+    "avg_trade_time_sec": 2.5208333333333335,
+    "isolated_deaths": 8,
+    "isolated_death_rate": 0.6153846153846154,
+    "multi_kills_2k": 3,
+    "multi_kills_3k": 3,
+    "clutches_won": 0,
+    "clutches_attempted": 1,
+    "avg_util_on_rifle_round": 1.8461538461538463,
+    "grade": "B"
+  },
+  "game_sense": {
+    "total_ct_rounds": 12,
+    "high_confidence_reads": 12,
+    "correct_positioning": 5,
+    "positioning_accuracy": 0.4166666666666667,
+    "avg_peak_belief": 0.6655591839798497
+  },
+  "nn_predictions": {
+    "available": true,
+    "attack_predictions": [
+      {
+        "round": 0,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.0009456395055167377,
+          "B": 0.01901639625430107,
+          "no_plant": 0.980038046836853
+        }
+      },
+      {
+        "round": 1,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.0004138830117881298,
+          "B": 0.01736731454730034,
+          "no_plant": 0.9822188019752502
+        }
+      },
+      {
+        "round": 2,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.0001916593173518777,
+          "B": 0.020769117400050163,
+          "no_plant": 0.9790392518043518
+        }
+      },
+      {
+        "round": 3,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 3.3834610803751275e-05,
+          "B": 0.006807055789977312,
+          "no_plant": 0.9931591153144836
+        }
+      },
+      {
+        "round": 4,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 9.861259059107397e-06,
+          "B": 0.004296480678021908,
+          "no_plant": 0.9956936836242676
+        }
+      },
+      {
+        "round": 5,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 5.8545520005282015e-06,
+          "B": 0.003861376317217946,
+          "no_plant": 0.9961328506469727
+        }
+      },
+      {
+        "round": 6,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 2.59615580944228e-06,
+          "B": 0.004612917546182871,
+          "no_plant": 0.9953845143318176
+        }
+      },
+      {
+        "round": 7,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 1.7217525964952074e-06,
+          "B": 0.0036211838014423847,
+          "no_plant": 0.996377170085907
+        }
+      },
+      {
+        "round": 8,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 2.086570020765066e-06,
+          "B": 0.0024852294009178877,
+          "no_plant": 0.9975125789642334
+        }
+      },
+      {
+        "round": 9,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 9.479892923991429e-07,
+          "B": 0.00212113163433969,
+          "no_plant": 0.9978779554367065
+        }
+      },
+      {
+        "round": 10,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 7.870632998674409e-07,
+          "B": 0.0015827900497242808,
+          "no_plant": 0.9984164237976074
+        }
+      },
+      {
+        "round": 11,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 6.377397880896751e-07,
+          "B": 0.0011873109033331275,
+          "no_plant": 0.9988120794296265
+        }
+      },
+      {
+        "round": 12,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.0009503889014013112,
+          "B": 0.01904500648379326,
+          "no_plant": 0.980004608631134
+        }
+      },
+      {
+        "round": 13,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.0003285764541942626,
+          "B": 0.012758580967783928,
+          "no_plant": 0.9869128465652466
+        }
+      },
+      {
+        "round": 14,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.0001792901603039354,
+          "B": 0.01899525709450245,
+          "no_plant": 0.9808254837989807
+        }
+      },
+      {
+        "round": 15,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 7.054025627439842e-05,
+          "B": 0.018267154693603516,
+          "no_plant": 0.9816623330116272
+        }
+      },
+      {
+        "round": 16,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 2.3219838112709112e-05,
+          "B": 0.013704245910048485,
+          "no_plant": 0.9862725734710693
+        }
+      },
+      {
+        "round": 17,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 1.6339068906745524e-06,
+          "B": 0.00579622620716691,
+          "no_plant": 0.9942020773887634
+        }
+      },
+      {
+        "round": 18,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 2.8487431791290874e-07,
+          "B": 0.002681023208424449,
+          "no_plant": 0.997318685054779
+        }
+      },
+      {
+        "round": 19,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 1.3125969644534052e-06,
+          "B": 0.0038461796939373016,
+          "no_plant": 0.9961524605751038
+        }
+      }
+    ],
+    "formation_predictions": [
+      {
+        "round": 0,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.0020500642713159323,
+          "1-2-2": 0.10980364680290222,
+          "1-1-3": 0.004409288056194782,
+          "2-2-1": 1.1210756838408997e-06,
+          "3-1-1": 3.741470674945013e-11,
+          "1-1-2": 0.020032992586493492,
+          "0-2-3": 0.000922185427043587,
+          "2-0-3": 4.7612310538625024e-08,
+          "other": 0.8627806305885315
+        }
+      },
+      {
+        "round": 1,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004723505582660437,
+          "1-2-2": 0.1467067450284958,
+          "1-1-3": 0.018301837146282196,
+          "2-2-1": 7.048929973052509e-08,
+          "3-1-1": 1.90752483253398e-11,
+          "1-1-2": 0.03323275223374367,
+          "0-2-3": 0.005385003983974457,
+          "2-0-3": 7.456694106622308e-08,
+          "other": 0.7916500568389893
+        }
+      },
+      {
+        "round": 2,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004237597342580557,
+          "1-2-2": 0.1258837729692459,
+          "1-1-3": 0.011284041218459606,
+          "2-2-1": 2.0095400543596043e-07,
+          "3-1-1": 3.581661009444126e-11,
+          "1-1-2": 0.034046072512865067,
+          "0-2-3": 0.002030931646004319,
+          "2-0-3": 1.562198121973779e-07,
+          "other": 0.8225172162055969
+        }
+      },
+      {
+        "round": 3,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.005730186123400927,
+          "1-2-2": 0.11532668024301529,
+          "1-1-3": 0.018277375027537346,
+          "2-2-1": 3.218831778895037e-08,
+          "3-1-1": 1.201620660612468e-11,
+          "1-1-2": 0.03618858754634857,
+          "0-2-3": 0.005186731927096844,
+          "2-0-3": 1.8606647245178465e-07,
+          "other": 0.8192901611328125
+        }
+      },
+      {
+        "round": 4,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004983172286301851,
+          "1-2-2": 0.09422451257705688,
+          "1-1-3": 0.015839215368032455,
+          "2-2-1": 3.8204554186904716e-08,
+          "3-1-1": 1.2303280789993654e-11,
+          "1-1-2": 0.03285587579011917,
+          "0-2-3": 0.003498768201097846,
+          "2-0-3": 3.336112683882675e-07,
+          "other": 0.848598062992096
+        }
+      },
+      {
+        "round": 5,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.006213610526174307,
+          "1-2-2": 0.08415210992097855,
+          "1-1-3": 0.02292860485613346,
+          "2-2-1": 8.552142105600069e-09,
+          "3-1-1": 4.960556271305094e-12,
+          "1-1-2": 0.03379649668931961,
+          "0-2-3": 0.007082127965986729,
+          "2-0-3": 4.234368873312633e-07,
+          "other": 0.8458266854286194
+        }
+      },
+      {
+        "round": 6,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.008454944007098675,
+          "1-2-2": 0.07602560520172119,
+          "1-1-3": 0.03779967501759529,
+          "2-2-1": 1.1850409542546458e-09,
+          "3-1-1": 1.5208948466946537e-12,
+          "1-1-2": 0.035519812256097794,
+          "0-2-3": 0.019230270758271217,
+          "2-0-3": 4.814957605958625e-07,
+          "other": 0.8229692578315735
+        }
+      },
+      {
+        "round": 7,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.006079488899558783,
+          "1-2-2": 0.05936842039227486,
+          "1-1-3": 0.02496315725147724,
+          "2-2-1": 3.43670158997611e-09,
+          "3-1-1": 2.5678370020598695e-12,
+          "1-1-2": 0.03023892641067505,
+          "0-2-3": 0.007229476235806942,
+          "2-0-3": 1.040677148012037e-06,
+          "other": 0.8721194863319397
+        }
+      },
+      {
+        "round": 8,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.005709428805857897,
+          "1-2-2": 0.05068339407444,
+          "1-1-3": 0.025084909051656723,
+          "2-2-1": 5.885787413006938e-10,
+          "3-1-1": 4.176850922424369e-13,
+          "1-1-2": 0.024367839097976685,
+          "0-2-3": 0.013620062731206417,
+          "2-0-3": 6.171539439492335e-07,
+          "other": 0.880533754825592
+        }
+      },
+      {
+        "round": 9,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.0017537014791741967,
+          "1-2-2": 0.03426986187696457,
+          "1-1-3": 0.005648571532219648,
+          "2-2-1": 4.415355858711223e-10,
+          "3-1-1": 2.7427433357796703e-14,
+          "1-1-2": 0.00945456326007843,
+          "0-2-3": 0.005350260529667139,
+          "2-0-3": 9.84443531137913e-08,
+          "other": 0.9435228705406189
+        }
+      },
+      {
+        "round": 10,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.00029912186437286437,
+          "1-2-2": 0.017165713012218475,
+          "1-1-3": 0.0006336441729217768,
+          "2-2-1": 3.860321506898856e-10,
+          "3-1-1": 7.279449323702332e-16,
+          "1-1-2": 0.0023702429607510567,
+          "0-2-3": 0.0012737356591969728,
+          "2-0-3": 7.816204572463903e-09,
+          "other": 0.9782574772834778
+        }
+      },
+      {
+        "round": 11,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.00019537864136509597,
+          "1-2-2": 0.012312567792832851,
+          "1-1-3": 0.0003934359410777688,
+          "2-2-1": 3.2637326174977943e-10,
+          "3-1-1": 3.1424652351382605e-16,
+          "1-1-2": 0.0016705939779058099,
+          "0-2-3": 0.000818817934487015,
+          "2-0-3": 7.456953277085177e-09,
+          "other": 0.9846091270446777
+        }
+      },
+      {
+        "round": 12,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.0019427234074100852,
+          "1-2-2": 0.10750703513622284,
+          "1-1-3": 0.0041060359217226505,
+          "2-2-1": 1.3439791928249178e-06,
+          "3-1-1": 4.041480691774346e-11,
+          "1-1-2": 0.019477516412734985,
+          "0-2-3": 0.0008118999539874494,
+          "2-0-3": 4.887755977733832e-08,
+          "other": 0.866153359413147
+        }
+      },
+      {
+        "round": 13,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004450402222573757,
+          "1-2-2": 0.1443617343902588,
+          "1-1-3": 0.011803913861513138,
+          "2-2-1": 1.7472265767537465e-07,
+          "3-1-1": 3.044762011961133e-11,
+          "1-1-2": 0.03441178426146507,
+          "0-2-3": 0.0028410691302269697,
+          "2-0-3": 8.190819755782286e-08,
+          "other": 0.8021308183670044
+        }
+      },
+      {
+        "round": 14,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.003894034307450056,
+          "1-2-2": 0.12312033772468567,
+          "1-1-3": 0.010011576116085052,
+          "2-2-1": 2.943286574463855e-07,
+          "3-1-1": 4.429424535490334e-11,
+          "1-1-2": 0.033025793731212616,
+          "0-2-3": 0.0015749541344121099,
+          "2-0-3": 1.6883427633729298e-07,
+          "other": 0.8283729553222656
+        }
+      },
+      {
+        "round": 15,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.005051823332905769,
+          "1-2-2": 0.11173641681671143,
+          "1-1-3": 0.015280037187039852,
+          "2-2-1": 5.746420939090058e-08,
+          "3-1-1": 1.66058850697981e-11,
+          "1-1-2": 0.03462805971503258,
+          "0-2-3": 0.0035368474200367928,
+          "2-0-3": 2.096839892828939e-07,
+          "other": 0.829766571521759
+        }
+      },
+      {
+        "round": 16,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.0041765812784433365,
+          "1-2-2": 0.08991540968418121,
+          "1-1-3": 0.012340396642684937,
+          "2-2-1": 8.448044042097536e-08,
+          "3-1-1": 1.9131838474573115e-11,
+          "1-1-2": 0.03082093596458435,
+          "0-2-3": 0.0020598703995347023,
+          "2-0-3": 3.9187983702504425e-07,
+          "other": 0.8606863617897034
+        }
+      },
+      {
+        "round": 17,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004336860962212086,
+          "1-2-2": 0.07665394246578217,
+          "1-1-3": 0.013775957748293877,
+          "2-2-1": 4.369660189240676e-08,
+          "3-1-1": 1.2306873402312402e-11,
+          "1-1-2": 0.029722165316343307,
+          "0-2-3": 0.002394668525084853,
+          "2-0-3": 5.907891136303078e-07,
+          "other": 0.8731157779693604
+        }
+      },
+      {
+        "round": 18,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004555250518023968,
+          "1-2-2": 0.0654374435544014,
+          "1-1-3": 0.015644747763872147,
+          "2-2-1": 2.1197783084403454e-08,
+          "3-1-1": 7.631431077348427e-12,
+          "1-1-2": 0.0287399273365736,
+          "0-2-3": 0.0028945866506546736,
+          "2-0-3": 8.775473361311015e-07,
+          "other": 0.8827271461486816
+        }
+      },
+      {
+        "round": 19,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.004741444252431393,
+          "1-2-2": 0.05563837289810181,
+          "1-1-3": 0.017556633800268173,
+          "2-2-1": 1.0583011800235909e-08,
+          "3-1-1": 4.803784540291511e-12,
+          "1-1-2": 0.02766033262014389,
+          "0-2-3": 0.003419894492253661,
+          "2-0-3": 1.308826881540881e-06,
+          "other": 0.8909819722175598
+        }
+      }
+    ],
+    "attack_accuracy": 0.3,
+    "win_pred_accuracy": 0.25
+  },
+  "coaching_tips": [
+    "Economy: Your buy decisions matched the optimal policy only 0% of the time.  Focus on saving when you should eco and buying up when the economy allows.",
+    "Positioning: 62% of your deaths were isolated (no teammate could trade).  Stay closer to teammates or hold positions where trades are possible.",
+    "Teamplay: Your trade rate is only 16% \u2014 when a teammate dies, try to refrag within 5 seconds."
+  ],
+  "round_details": [
+    {
+      "round": 0,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 1,
+      "deaths": 1,
+      "damage": 108,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "game_sense": {
+        "peak_zone": "A",
+        "peak_prob": 0.63,
+        "player_zone": "",
+        "correct": false,
+        "note": "Belief showed 63% chance at A by 15s \u2014 position data unavailable"
+      },
+      "suggestions": [
+        "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly."
+      ]
+    },
+    {
+      "round": 1,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.69,
+        "player_zone": "",
+        "correct": false,
+        "note": "Belief reached 69% at B by 26s (died before rotation window)"
+      },
+      "suggestions": [
+        "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly."
+      ]
+    },
+    {
+      "round": 2,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 95,
+      "economy": {
+        "money": 1000,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy won last round \u2014 expect FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": true,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Lost opening duel"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.58,
+        "player_zone": "",
+        "correct": false,
+        "note": "Belief reached 58% at B by 13s (died before rotation window)"
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $1000).",
+        "Enemy won last round \u2014 expect FULL BUY \u2014 play default setup, use all your utility.",
+        "Died first this round. Use utility (flash/smoke) before peeking, or change your angle next time.",
+        "You died but a teammate traded the kill \u2014 acceptable if you gained info or map control.",
+        "Info pointed to B (58%) but you died before you could rotate \u2014 avoid early aggressive peeks when you need to anchor a site."
+      ]
+    },
+    {
+      "round": 3,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "economy": {
+        "money": 1550,
+        "action": "FORCE",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy won last round \u2014 expect FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": true,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Lost opening duel",
+          "Died without trade"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "A",
+        "peak_prob": 0.55,
+        "player_zone": "",
+        "correct": false,
+        "note": "Belief reached 55% at A by 44s (died before rotation window)"
+      },
+      "suggestions": [
+        "Good buy decision (FORCE at $1550).",
+        "Enemy won last round \u2014 expect FULL BUY \u2014 play default setup, use all your utility.",
+        "Died first this round. Use utility (flash/smoke) before peeking, or change your angle next time.",
+        "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+        "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team.",
+        "Info pointed to A (55%) but you died before you could rotate \u2014 avoid early aggressive peeks when you need to anchor a site."
+      ]
+    },
+    {
+      "round": 4,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 250,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.79,
+        "player_zone": "MID",
+        "correct": true,
+        "note": "Good read: at B matching 79% belief"
+      },
+      "suggestions": [
+        "Good game sense \u2014 you read the B attack correctly (79% belief) and were in position."
+      ]
+    },
+    {
+      "round": 5,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 3,
+      "deaths": 0,
+      "damage": 217,
+      "economy": {
+        "money": 3300,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 1 \u2014 likely ECO round"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 3,
+        "clutch": false,
+        "notes": [
+          "3K round"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.57,
+        "player_zone": "B",
+        "correct": true,
+        "note": "Good read: at B matching 57% belief"
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $3300).",
+        "Enemy lost 1 \u2014 likely ECO round \u2014 you can play more aggressively and save utility.",
+        "Impact round with 3 kills and 217 damage!",
+        "Good game sense \u2014 you read the B attack correctly (57% belief) and were in position."
+      ]
+    },
+    {
+      "round": 6,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 1,
+      "deaths": 1,
+      "damage": 100,
+      "economy": {
+        "money": 4350,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 2 \u2014 possible FORCE buy"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "game_sense": {
+        "peak_zone": "A",
+        "peak_prob": 0.64,
+        "player_zone": "A",
+        "correct": true,
+        "note": "Good read: at A matching 64% belief"
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $4350).",
+        "Enemy lost 2 \u2014 possible FORCE buy \u2014 expect a mix of pistols and SMGs, play safe angles.",
+        "You died but a teammate traded the kill \u2014 acceptable if you gained info or map control.",
+        "Good game sense \u2014 you read the A attack correctly (64% belief) and were in position."
+      ]
+    },
+    {
+      "round": 7,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 100,
+      "economy": {
+        "money": 2500,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy won last round \u2014 expect FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.71,
+        "player_zone": "A",
+        "correct": false,
+        "note": "Belief showed 71% chance at B by 31s, but you were at A"
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $2500).",
+        "Enemy won last round \u2014 expect FULL BUY \u2014 play default setup, use all your utility.",
+        "Attack came to B (71% belief) but you were at A. Rotate faster when you hear contact or see utility at B."
+      ]
+    },
+    {
+      "round": 8,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 5,
+      "economy": {
+        "money": 3400,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 1 \u2014 likely ECO round"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.73,
+        "player_zone": "",
+        "correct": false,
+        "note": "Belief reached 73% at B by 77s (died before rotation window)"
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $3400).",
+        "Enemy lost 1 \u2014 likely ECO round \u2014 you can play more aggressively and save utility.",
+        "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+        "Only 5 damage this round. Look for opportunities to deal more damage through utility or repositioning.",
+        "Info pointed to B (73%) but you died before you could rotate \u2014 avoid early aggressive peeks when you need to anchor a site."
+      ]
+    },
+    {
+      "round": 9,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 3,
+      "deaths": 0,
+      "damage": 296,
+      "economy": {
+        "money": 2050,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 2 \u2014 possible FORCE buy"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 3,
+        "clutch": false,
+        "notes": [
+          "3K round"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.62,
+        "player_zone": "B",
+        "correct": true,
+        "note": "Good read: at B matching 62% belief"
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $2050).",
+        "Enemy lost 2 \u2014 possible FORCE buy \u2014 expect a mix of pistols and SMGs, play safe angles.",
+        "Impact round with 3 kills and 296 damage!",
+        "Good game sense \u2014 you read the B attack correctly (62% belief) and were in position."
+      ]
+    },
+    {
+      "round": 10,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 0,
+      "deaths": 0,
+      "damage": 0,
+      "economy": {
+        "money": 3000,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 3 \u2014 loss bonus allows FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "game_sense": {
+        "peak_zone": "A",
+        "peak_prob": 0.7,
+        "player_zone": "B",
+        "correct": false,
+        "note": "Belief showed 70% chance at A by 43s, but you were at B"
+      },
+      "suggestions": [
+        "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly."
+      ]
+    },
+    {
+      "round": 11,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 4,
+      "economy": {
+        "money": 4700,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 4 \u2014 loss bonus allows FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "game_sense": {
+        "peak_zone": "B",
+        "peak_prob": 0.77,
+        "player_zone": "B",
+        "correct": true,
+        "note": "Good read: at B matching 77% belief"
+      },
+      "suggestions": [
+        "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly."
+      ]
+    },
+    {
+      "round": 12,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": true,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Lost opening duel",
+          "Died without trade"
+        ]
+      },
+      "suggestions": [
+        "Died first this round. Use utility (flash/smoke) before peeking, or change your angle next time.",
+        "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+        "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team."
+      ]
+    },
+    {
+      "round": 13,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "suggestions": [
+        "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+        "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team."
+      ]
+    },
+    {
+      "round": 14,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 84,
+      "economy": {
+        "money": 2600,
+        "action": "FORCE",
+        "optimal": "SAVE",
+        "is_optimal": false,
+        "enemy_prediction": "Enemy lost 2 \u2014 possible FORCE buy"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": [
+        "Over-bought (did FORCE at $2600, optimal was SAVE). Save this round to guarantee a full buy next round.",
+        "Enemy lost 2 \u2014 possible FORCE buy \u2014 expect a mix of pistols and SMGs, play safe angles.",
+        "You died but a teammate traded the kill \u2014 acceptable if you gained info or map control."
+      ]
+    },
+    {
+      "round": 15,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 133,
+      "economy": {
+        "money": 1700,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 3 \u2014 loss bonus allows FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $1700).",
+        "Enemy lost 3 \u2014 loss bonus allows FULL BUY \u2014 play default setup, use all your utility."
+      ]
+    },
+    {
+      "round": 16,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 100,
+      "economy": {
+        "money": 1750,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 4 \u2014 loss bonus allows FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": true,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Won opening duel"
+        ]
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $1750).",
+        "Enemy lost 4 \u2014 loss bonus allows FULL BUY \u2014 play default setup, use all your utility.",
+        "Great opening frag \u2014 first blood gives your team a huge advantage."
+      ]
+    },
+    {
+      "round": 17,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 1,
+      "deaths": 1,
+      "damage": 161,
+      "economy": {
+        "money": 4500,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 5 \u2014 loss bonus allows FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $4500).",
+        "Enemy lost 5 \u2014 loss bonus allows FULL BUY \u2014 play default setup, use all your utility.",
+        "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds."
+      ]
+    },
+    {
+      "round": 18,
+      "side": "T",
+      "winner": "CT",
+      "won": false,
+      "kills": 3,
+      "deaths": 1,
+      "damage": 177,
+      "economy": {
+        "money": 3150,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy lost 5 \u2014 loss bonus allows FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 3,
+        "clutch": false,
+        "notes": [
+          "3K round",
+          "Died without trade",
+          "1v5 clutch attempt"
+        ]
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $3150).",
+        "Enemy lost 5 \u2014 loss bonus allows FULL BUY \u2014 play default setup, use all your utility.",
+        "1v5 clutch attempt \u2014 tough situation. If the round is unwinnable, consider saving your weapon for next round.",
+        "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds."
+      ]
+    },
+    {
+      "round": 19,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 26,
+      "economy": {
+        "money": 3450,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy won last round \u2014 expect FULL BUY"
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": [
+        "Good buy decision (FULL_BUY at $3450).",
+        "Enemy won last round \u2014 expect FULL BUY \u2014 play default setup, use all your utility.",
+        "You died but a teammate traded the kill \u2014 acceptable if you gained info or map control.",
+        "Only 26 damage this round. Look for opportunities to deal more damage through utility or repositioning."
+      ]
+    }
+  ]
+}

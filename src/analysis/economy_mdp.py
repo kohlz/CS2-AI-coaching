@@ -155,27 +155,39 @@ def _loss_bonus(streak: int) -> int:
     return LOSS_BONUS[idx]
 
 
-def _opponent_equip_dist(my_loss_streak: int) -> np.ndarray:
-    """Estimate opponent equipment distribution based on my loss streak.
+def _opponent_equip_dist(enemy_loss_streak: int) -> np.ndarray:
+    """Estimate opponent equipment distribution from their observable loss streak.
 
-    If I've been losing, the opponent has been winning → they're rich.
-    If I just won, the opponent lost → they may eco.
+    In CS2, the scoreboard reveals the enemy's win/loss history, so their
+    loss streak is public knowledge.  The distribution reflects typical
+    buy behaviour given accumulated loss bonus money:
+
+      streak 0 — just won, flush with cash → almost always full buy
+      streak 1 — lost after buying, broke  → classic eco round
+      streak 2 — $1,900 bonus, building up → mix of eco/force
+      streak 3 — $2,400 bonus, can buy     → likely full buy (3rd-round buy)
+      streak 4 — $2,900 bonus              → full buy
+      streak 5+— $3,400 max bonus          → full buy
     """
-    if my_loss_streak == 0:
-        return np.array([0.45, 0.30, 0.25])
-    elif my_loss_streak == 1:
-        return np.array([0.10, 0.20, 0.70])
-    else:
-        return np.array([0.05, 0.10, 0.85])
+    distributions = {
+        0: np.array([0.05, 0.10, 0.85]),   # just won → rich
+        1: np.array([0.65, 0.20, 0.15]),   # first loss → broke
+        2: np.array([0.30, 0.45, 0.25]),   # building up
+        3: np.array([0.10, 0.25, 0.65]),   # 3rd-round buy
+        4: np.array([0.05, 0.20, 0.75]),   # can full buy
+        5: np.array([0.05, 0.15, 0.80]),   # max loss bonus
+    }
+    k = min(enemy_loss_streak, MAX_LOSS_STREAK)
+    return distributions[k]
 
 
 # ---------------------------------------------------------------------------
 # MDP Transition Model
 # ---------------------------------------------------------------------------
 
-def _expected_win_prob(side: str, my_tier: int, my_loss_streak: int) -> float:
-    """Expected win probability given my equipment tier and loss streak."""
-    opp_dist = _opponent_equip_dist(my_loss_streak)
+def _expected_win_prob(side: str, my_tier: int, enemy_loss_streak: int) -> float:
+    """Expected win probability given my equipment tier and enemy loss streak."""
+    opp_dist = _opponent_equip_dist(enemy_loss_streak)
     return float(WIN_PROB[side][my_tier] @ opp_dist)
 
 
@@ -206,29 +218,40 @@ def _next_money_loss(side: str, money_after_buy: int, new_streak: int) -> int:
 
 @dataclass
 class EconomyPolicy:
-    """Solved MDP policy for one side (T or CT)."""
+    """Solved MDP policy for one side (T or CT).
+
+    State space: (money_bin, my_loss_streak, enemy_loss_streak).
+    """
     side: str
-    V: np.ndarray            # shape (N_MONEY_BINS, N_STREAKS)
-    policy: np.ndarray       # shape (N_MONEY_BINS, N_STREAKS), values in {0,1,2}
+    V: np.ndarray            # shape (N_MONEY_BINS, N_STREAKS, N_STREAKS)
+    policy: np.ndarray       # shape (N_MONEY_BINS, N_STREAKS, N_STREAKS), values in {0,1,2}
 
-    def recommend(self, money: int, loss_streak: int) -> int:
+    def recommend(self, money: int, loss_streak: int,
+                  enemy_loss_streak: int = 0) -> int:
         b = _money_to_bin(money)
         k = min(loss_streak, MAX_LOSS_STREAK)
-        return int(self.policy[b, k])
+        ek = min(enemy_loss_streak, MAX_LOSS_STREAK)
+        return int(self.policy[b, k, ek])
 
-    def value(self, money: int, loss_streak: int) -> float:
+    def value(self, money: int, loss_streak: int,
+              enemy_loss_streak: int = 0) -> float:
         b = _money_to_bin(money)
         k = min(loss_streak, MAX_LOSS_STREAK)
-        return float(self.V[b, k])
+        ek = min(enemy_loss_streak, MAX_LOSS_STREAK)
+        return float(self.V[b, k, ek])
 
 
 def solve_economy_mdp(side: str, gamma: float = GAMMA) -> EconomyPolicy:
     """Solve the economy MDP for one side using Value Iteration.
 
+    State: (money_bin, my_loss_streak, enemy_loss_streak)
+    Transitions on win:  my_streak → 0,  enemy_streak → min(ek+1, MAX)
+    Transitions on loss: my_streak → min(k+1, MAX),  enemy_streak → 0
+
     Returns an EconomyPolicy with the optimal value function and policy.
     """
-    V = np.zeros((N_MONEY_BINS, N_STREAKS))
-    policy = np.zeros((N_MONEY_BINS, N_STREAKS), dtype=int)
+    V = np.zeros((N_MONEY_BINS, N_STREAKS, N_STREAKS))
+    policy = np.zeros((N_MONEY_BINS, N_STREAKS, N_STREAKS), dtype=int)
 
     costs = EQUIP_COST[side]
 
@@ -238,39 +261,44 @@ def solve_economy_mdp(side: str, gamma: float = GAMMA) -> EconomyPolicy:
         for b in range(N_MONEY_BINS):
             money = _bin_to_money(b)
             for k in range(N_STREAKS):
-                best_val = -1e9
-                best_act = SAVE
+                for ek in range(N_STREAKS):
+                    best_val = -1e9
+                    best_act = SAVE
 
-                for a in ACTIONS:
-                    cost = costs[a]
-                    actual_cost = min(cost, money)  # can't spend more than you have
+                    for a in ACTIONS:
+                        cost = costs[a]
+                        actual_cost = min(cost, money)
 
-                    if a != SAVE and cost > money:
-                        continue  # can't afford this buy tier
+                        if a != SAVE and cost > money:
+                            continue
 
-                    money_after = money - actual_cost
-                    tier = ACTION_TIER[a]
-                    p_win = _expected_win_prob(side, tier, k)
+                        money_after = money - actual_cost
+                        tier = ACTION_TIER[a]
+                        p_win = _expected_win_prob(side, tier, ek)
 
-                    # Win branch
-                    next_m_win = _next_money_win(side, money_after)
-                    b_win = _money_to_bin(next_m_win)
-                    k_win = 0
+                        # Win branch: my streak resets, enemy streak grows
+                        next_m_win = _next_money_win(side, money_after)
+                        b_win = _money_to_bin(next_m_win)
+                        k_win = 0
+                        ek_win = min(ek + 1, MAX_LOSS_STREAK)
 
-                    # Loss branch
-                    k_loss = min(k + 1, MAX_LOSS_STREAK)
-                    next_m_loss = _next_money_loss(side, money_after, k_loss)
-                    b_loss = _money_to_bin(next_m_loss)
+                        # Loss branch: my streak grows, enemy streak resets
+                        k_loss = min(k + 1, MAX_LOSS_STREAK)
+                        ek_loss = 0
+                        next_m_loss = _next_money_loss(side, money_after, k_loss)
+                        b_loss = _money_to_bin(next_m_loss)
 
-                    q = (p_win * (WIN_REWARD_MDP + gamma * V[b_win, k_win]) +
-                         (1 - p_win) * (LOSS_PENALTY_MDP + gamma * V[b_loss, k_loss]))
+                        q = (p_win * (WIN_REWARD_MDP +
+                                      gamma * V[b_win, k_win, ek_win]) +
+                             (1 - p_win) * (LOSS_PENALTY_MDP +
+                                            gamma * V[b_loss, k_loss, ek_loss]))
 
-                    if q > best_val:
-                        best_val = q
-                        best_act = a
+                        if q > best_val:
+                            best_val = q
+                            best_act = a
 
-                V_new[b, k] = best_val
-                policy[b, k] = best_act
+                    V_new[b, k, ek] = best_val
+                    policy[b, k, ek] = best_act
 
         delta = np.max(np.abs(V_new - V))
         V = V_new
@@ -334,6 +362,7 @@ class BuyEvaluation:
     side: str
     money: int
     loss_streak: int
+    enemy_loss_streak: int
     actual_action: int
     optimal_action: int
     actual_name: str
@@ -344,7 +373,18 @@ class BuyEvaluation:
     win_prob_diff: float
     actual_value: float
     optimal_value: float
+    enemy_buy_prediction: str = ""
     note: str = ""
+    # Enhanced fields (Economy HMM + matchup evaluation)
+    enemy_predicted_tier: str = ""           # "BROKE", "LOW", "MEDIUM", "HIGH", "RICH"
+    enemy_tier_probs: dict = field(default_factory=dict)
+    enemy_predicted_money: int = 0
+    weapon_matchup_note: str = ""
+    team_avg_money: int = 0
+    team_can_fullbuy_next: bool = True
+    player_can_fullbuy_next: bool = True
+    is_drop_or_pickup: bool = False
+    upgrade_path_note: str = ""
 
 
 def _is_knife_or_pistol(round_num: int) -> bool:
@@ -352,15 +392,143 @@ def _is_knife_or_pistol(round_num: int) -> bool:
     return round_num <= 1
 
 
+def _predict_enemy_buy(enemy_loss_streak: int,
+                       hmm_pred: dict | None = None) -> str:
+    """Human-readable prediction of enemy buy tier for coaching notes.
+
+    If hmm_pred is available, uses HMM prediction; otherwise falls back
+    to simple loss-streak heuristic.
+    """
+    if hmm_pred:
+        tier = hmm_pred.get("predicted_tier", "")
+        money = hmm_pred.get("predicted_avg_money", 0)
+        probs = hmm_pred.get("tier_probs", {})
+        top_p = probs.get(tier, 0)
+        tier_label = {
+            "BROKE": "ECO round",
+            "LOW": "FORCE buy or upgraded pistols",
+            "MEDIUM": "FORCE buy or light rifles",
+            "HIGH": "FULL BUY with rifles",
+            "RICH": "FULL BUY with AWP possible",
+        }.get(tier, "unknown")
+        return f"Enemy ~${money} ({tier_label}, {top_p:.0%} confidence)"
+
+    if enemy_loss_streak == 0:
+        return "Enemy won last round — expect FULL BUY"
+    elif enemy_loss_streak == 1:
+        return "Enemy lost 1 — likely ECO round"
+    elif enemy_loss_streak == 2:
+        return "Enemy lost 2 — possible FORCE buy"
+    elif enemy_loss_streak >= 3:
+        return f"Enemy lost {enemy_loss_streak} — loss bonus allows FULL BUY"
+    return ""
+
+
+# ---------------------------------------------------------------------------
+# Enhanced evaluation helpers (weapon matchup, team trajectory, upgrade path)
+# ---------------------------------------------------------------------------
+
+_WEAPON_TIER = {
+    "AK-47": "rifle", "M4A4": "rifle", "M4A1-S": "rifle",
+    "SG 553": "rifle", "AUG": "rifle", "AWP": "awp",
+    "SSG 08": "rifle", "SCAR-20": "rifle", "G3SG1": "rifle",
+    "Galil AR": "rifle", "FAMAS": "rifle",
+    "MP9": "smg", "MP7": "smg", "MP5-SD": "smg", "UMP-45": "smg",
+    "P90": "smg", "PP-Bizon": "smg", "MAC-10": "smg",
+    "XM1014": "shotgun", "Nova": "shotgun", "MAG-7": "shotgun", "Sawed-Off": "shotgun",
+    "M249": "lmg", "Negev": "lmg",
+}
+
+# Full buy cost threshold per side
+_FULL_BUY_COST = {"T": 4700, "CT": 5500}
+
+
+def _weapon_matchup_note(primary_weapon: str | None,
+                         enemy_tier: str,
+                         side: str) -> str:
+    """Evaluate whether the player's weapon matches the predicted enemy economy."""
+    if not primary_weapon:
+        return ""
+    w_tier = _WEAPON_TIER.get(primary_weapon, "pistol")
+
+    if enemy_tier in ("BROKE", "LOW"):
+        if w_tier == "awp":
+            return f"AWP vs predicted eco — overkill, could save ${2750 if side == 'T' else 4750} for team"
+        if w_tier == "rifle":
+            return "Rifle vs eco — solid, but SMG would earn more kill reward"
+        if w_tier == "smg":
+            return "SMG vs eco — good economy choice, extra kill reward"
+        return ""
+
+    if enemy_tier in ("HIGH", "RICH"):
+        if w_tier == "smg":
+            return "SMG vs predicted full buy — outgunned at range"
+        if w_tier == "pistol":
+            return "Pistol vs predicted full buy — major disadvantage"
+        if w_tier == "awp":
+            return "AWP vs full buy — strong pick potential"
+        return ""
+
+    return ""
+
+
+def _team_economy_analysis(
+    rd, target_player: str, side: str,
+) -> tuple[int, bool, bool]:
+    """Analyze team economy: avg money, can team full-buy next round.
+
+    Returns (team_avg_money, team_can_fullbuy_next, player_can_fullbuy_next).
+    """
+    teammates = rd.t_players if side == "T" else rd.ct_players
+    moneys = [p.start_money for p in teammates if p.start_money is not None]
+    if not moneys:
+        return (0, True, True)
+
+    team_avg = int(sum(moneys) / len(moneys))
+    fullbuy_cost = _FULL_BUY_COST[side]
+
+    p = rd.get_player(target_player)
+    player_money = p.start_money if p else 0
+
+    expected_income = 1900
+    team_can = (team_avg + expected_income) >= fullbuy_cost
+    player_can = (player_money + expected_income) >= fullbuy_cost
+
+    return (team_avg, team_can, player_can)
+
+
+def _detect_drop_or_pickup(primary_weapon: str | None,
+                           money: int, side: str) -> bool:
+    """Detect if the player likely received a dropped weapon or picked one up."""
+    if primary_weapon is None:
+        return False
+
+    weapon_costs = {
+        "AK-47": 2700, "M4A4": 3100, "M4A1-S": 2900,
+        "SG 553": 3000, "AUG": 3300, "AWP": 4750,
+        "SSG 08": 1700, "SCAR-20": 5000, "G3SG1": 5000,
+        "Galil AR": 1800, "FAMAS": 2050,
+    }
+    cost = weapon_costs.get(primary_weapon, 0)
+    if cost == 0:
+        return False
+
+    # If the weapon costs more than the player's starting money, they got it
+    # from a drop or pickup
+    min_total_buy = cost + 650  # weapon + kevlar
+    return money < min_total_buy
+
+
 def evaluate_player_economy(
     rounds: list,  # list[RoundData]
     target_player: str,
+    hmm_predictions: list[dict] | None = None,
 ) -> list[BuyEvaluation]:
     """Evaluate the target player's buy decisions across all rounds.
 
     Accounts for equipment carry-over (surviving players keep their gear),
-    skips knife round (round 0) and pistol rounds, and resets loss streak
-    at halftime.
+    skips knife round (round 0) and pistol rounds, resets loss streak
+    at halftime, and tracks enemy loss streak for opponent economy prediction.
 
     Parameters
     ----------
@@ -368,6 +536,8 @@ def evaluate_player_economy(
         Parsed round data from demo_parser.
     target_player : str
         In-game name to analyze.
+    hmm_predictions : list[dict] or None
+        Per-round Economy HMM predictions from info_model.predict_enemy_economy.
 
     Returns
     -------
@@ -377,11 +547,17 @@ def evaluate_player_economy(
     t_policy = solve_economy_mdp("T")
     ct_policy = solve_economy_mdp("CT")
 
+    hmm_by_round: dict[int, dict] = {}
+    if hmm_predictions:
+        for pred in hmm_predictions:
+            hmm_by_round[pred["round_num"]] = pred
+
     evaluations: list[BuyEvaluation] = []
     loss_streak = 0
+    enemy_loss_streak = 0
     prev_alive = False
     prev_side: Optional[str] = None
-    is_pistol = False  # next round after side switch is pistol
+    is_pistol = False
 
     for rd in rounds:
         p = rd.get_player(target_player)
@@ -394,81 +570,75 @@ def evaluate_player_economy(
             prev_alive = False
             continue
 
-        # Detect half-time side switch → reset economy state
+        # Detect half-time side switch → reset both streaks
         if prev_side is not None and prev_side != side:
             loss_streak = 0
+            enemy_loss_streak = 0
             prev_alive = False
-            is_pistol = True   # first round after side switch = pistol
+            is_pistol = True
 
         prev_side = side
         money = p.start_money
 
-        # Skip knife round, pistol rounds (first after each half), and
-        # any round where the player had <$1000 (economy reset / pistol)
         skip = _is_knife_or_pistol(rd.round_num) or is_pistol or money < 1000
         if skip:
             is_pistol = False
             won = (rd.winner == side)
-            loss_streak = 0 if won else min(loss_streak + 1, MAX_LOSS_STREAK)
+            if won:
+                loss_streak = 0
+                enemy_loss_streak = min(enemy_loss_streak + 1, MAX_LOSS_STREAK)
+            else:
+                loss_streak = min(loss_streak + 1, MAX_LOSS_STREAK)
+                enemy_loss_streak = 0
             prev_alive = p.alive_at_end
             continue
 
         policy = t_policy if side == "T" else ct_policy
 
-        # Classify what equipment tier the player ACTUALLY HAS
         actual_equip = classify_buy_decision(
             p.primary_weapon, p.secondary_weapon,
             p.has_helmet, p.armor,
             p.equipment_value, p.utilities,
         )
 
-        # Determine what the player could afford to buy from scratch
         best_affordable = SAVE
         for a in [FULL_BUY, FORCE]:
             if EQUIP_COST[side][a] <= money:
                 best_affordable = a
                 break
 
-        # What the optimal policy says to do with this money + streak
-        optimal = policy.recommend(money, loss_streak)
+        optimal = policy.recommend(money, loss_streak, enemy_loss_streak)
 
         note = ""
 
-        # Handle equipment carry-over:
-        # If player survived last round, they may carry equipment worth
-        # more than what they'd buy fresh. The effective tier is what they
-        # HAVE, not what they spent. Their buy decision only matters for
-        # the gap between what they carry and what they could upgrade to.
         if prev_alive and actual_equip > best_affordable:
             actual = actual_equip
             is_optimal = True
             note = "(carried equipment)"
         elif EQUIP_COST[side][actual_equip] > money and actual_equip > best_affordable:
-            # Equipment value exceeds what money could buy → must be carried
-            # or picked up (possible even after dying due to demo tick timing)
             actual = actual_equip
             is_optimal = (actual_equip >= optimal)
             if is_optimal:
                 note = "(carried/picked up)"
         else:
-            # Fresh buy decision — this is what the MDP evaluates
             actual = actual_equip
             is_optimal = (actual == optimal)
 
         actual_tier = ACTION_TIER[actual]
         optimal_tier = ACTION_TIER[optimal]
-        actual_wp = _expected_win_prob(side, actual_tier, loss_streak)
-        optimal_wp = _expected_win_prob(side, optimal_tier, loss_streak)
+        actual_wp = _expected_win_prob(side, actual_tier, enemy_loss_streak)
+        optimal_wp = _expected_win_prob(side, optimal_tier, enemy_loss_streak)
 
         cost_actual = min(EQUIP_COST[side][actual], money)
         money_after_actual = money - cost_actual
+        ek_win = min(enemy_loss_streak + 1, MAX_LOSS_STREAK)
         actual_val = (actual_wp * (WIN_REWARD_MDP + GAMMA * policy.value(
-            _next_money_win(side, money_after_actual), 0))
+            _next_money_win(side, money_after_actual), 0, ek_win))
             + (1 - actual_wp) * (LOSS_PENALTY_MDP + GAMMA * policy.value(
             _next_money_loss(side, money_after_actual,
                              min(loss_streak + 1, MAX_LOSS_STREAK)),
-            min(loss_streak + 1, MAX_LOSS_STREAK))))
-        optimal_val = policy.value(money, loss_streak)
+            min(loss_streak + 1, MAX_LOSS_STREAK), 0)))
+        optimal_val = policy.value(money, loss_streak, enemy_loss_streak)
 
         if not is_optimal and not note:
             if actual < optimal and EQUIP_COST[side][optimal] <= money:
@@ -484,11 +654,24 @@ def evaluate_player_economy(
             elif actual < optimal:
                 note = "Could not afford optimal buy"
 
+        # Enhanced economy evaluation
+        hmm_pred = hmm_by_round.get(rd.round_num)
+        enemy_buy_pred = _predict_enemy_buy(enemy_loss_streak, hmm_pred)
+        enemy_tier = hmm_pred.get("predicted_tier", "") if hmm_pred else ""
+        enemy_probs = hmm_pred.get("tier_probs", {}) if hmm_pred else {}
+        enemy_money = hmm_pred.get("predicted_avg_money", 0) if hmm_pred else 0
+
+        matchup_note = _weapon_matchup_note(p.primary_weapon, enemy_tier, side)
+        team_avg, team_fb, player_fb = _team_economy_analysis(
+            rd, target_player, side)
+        is_drop = _detect_drop_or_pickup(p.primary_weapon, money, side)
+
         evaluations.append(BuyEvaluation(
             round_num=rd.round_num,
             side=side,
             money=money,
             loss_streak=loss_streak,
+            enemy_loss_streak=enemy_loss_streak,
             actual_action=actual,
             optimal_action=optimal,
             actual_name=ACTION_NAMES[actual],
@@ -499,14 +682,84 @@ def evaluate_player_economy(
             win_prob_diff=optimal_wp - actual_wp,
             actual_value=actual_val,
             optimal_value=optimal_val,
+            enemy_buy_prediction=enemy_buy_pred,
             note=note,
+            enemy_predicted_tier=enemy_tier,
+            enemy_tier_probs=enemy_probs,
+            enemy_predicted_money=enemy_money,
+            weapon_matchup_note=matchup_note,
+            team_avg_money=team_avg,
+            team_can_fullbuy_next=team_fb,
+            player_can_fullbuy_next=player_fb,
+            is_drop_or_pickup=is_drop,
         ))
 
         won = (rd.winner == side)
-        loss_streak = 0 if won else min(loss_streak + 1, MAX_LOSS_STREAK)
+        if won:
+            loss_streak = 0
+            enemy_loss_streak = min(enemy_loss_streak + 1, MAX_LOSS_STREAK)
+        else:
+            loss_streak = min(loss_streak + 1, MAX_LOSS_STREAK)
+            enemy_loss_streak = 0
         prev_alive = p.alive_at_end
 
+    # Post-process: weapon upgrade path annotations
+    _annotate_upgrade_paths(evaluations, rounds, target_player)
+
     return evaluations
+
+
+def _annotate_upgrade_paths(evaluations: list[BuyEvaluation],
+                            rounds: list, target_player: str) -> None:
+    """Annotate consecutive eco/force rounds with weapon upgrade path notes."""
+    buy_tier_names = {SAVE: "eco", FORCE: "half-buy", FULL_BUY: "full buy"}
+
+    weapon_tier_order = {"pistol": 0, "smg": 1, "shotgun": 1,
+                         "rifle": 2, "awp": 3, "lmg": 2}
+    player_weapons = {}
+    for rd in rounds:
+        p = rd.get_player(target_player)
+        if p and p.primary_weapon:
+            player_weapons[rd.round_num] = p.primary_weapon
+        elif p:
+            player_weapons[rd.round_num] = None
+
+    # Find consecutive non-fullbuy streaks
+    i = 0
+    while i < len(evaluations):
+        if evaluations[i].actual_action == FULL_BUY:
+            i += 1
+            continue
+
+        streak = [evaluations[i]]
+        j = i + 1
+        while j < len(evaluations) and evaluations[j].actual_action != FULL_BUY:
+            streak.append(evaluations[j])
+            j += 1
+
+        if len(streak) >= 2:
+            path_parts = []
+            for ev in streak:
+                wpn = player_weapons.get(ev.round_num)
+                w_tier = _WEAPON_TIER.get(wpn, "pistol") if wpn else "pistol"
+                buy_label = buy_tier_names.get(ev.actual_action, "?")
+                path_parts.append(f"R{ev.round_num} {buy_label} (${ev.money})")
+
+            tiers = []
+            for ev in streak:
+                wpn = player_weapons.get(ev.round_num)
+                tiers.append(weapon_tier_order.get(
+                    _WEAPON_TIER.get(wpn, "pistol") if wpn else "pistol", 0))
+
+            if all(tiers[k] <= tiers[k+1] for k in range(len(tiers)-1)):
+                note = f"Good upgrade path: {' → '.join(path_parts)}"
+            else:
+                note = f"Upgrade path: {' → '.join(path_parts)}"
+
+            for ev in streak:
+                ev.upgrade_path_note = note
+
+        i = j
 
 
 def economy_summary(evaluations: list[BuyEvaluation]) -> dict:
@@ -525,11 +778,14 @@ def economy_summary(evaluations: list[BuyEvaluation]) -> dict:
     under_buys = sum(1 for e in mistakes
                      if e.actual_action < e.optimal_action)
 
-    # Distinguish fresh buy decisions from carried/team-dropped rounds
     fresh_buys = [e for e in evaluations if not e.note.startswith("(carried")]
     fresh_n = len(fresh_buys)
     fresh_optimal = sum(1 for e in fresh_buys if e.is_optimal)
     team_drops = n - fresh_n
+
+    # Mistakes against eco opponents (force-buying vs eco is wasteful)
+    vs_eco_mistakes = sum(1 for e in mistakes if e.enemy_loss_streak == 1)
+    vs_buy_mistakes = sum(1 for e in mistakes if e.enemy_loss_streak == 0)
 
     return {
         "total_rounds": n,
@@ -541,6 +797,8 @@ def economy_summary(evaluations: list[BuyEvaluation]) -> dict:
         "mistakes": len(mistakes),
         "over_buys": over_buys,
         "under_buys": under_buys,
+        "mistakes_vs_enemy_eco": vs_eco_mistakes,
+        "mistakes_vs_enemy_buy": vs_buy_mistakes,
         "avg_wp_loss_per_mistake": avg_wp_loss,
         "grade": _grade(n_optimal / n),
     }
@@ -562,26 +820,44 @@ def _grade(accuracy: float) -> str:
 # Debug / CLI
 # ---------------------------------------------------------------------------
 
-def print_policy(policy: EconomyPolicy) -> None:
-    """Print the optimal policy as a readable table."""
-    print(f"\nOptimal Buy Policy ({policy.side} side)")
-    print(f"{'Money':>8s}", end="")
-    for k in range(N_STREAKS):
-        label = f"L{k}" if k > 0 else "W"
-        print(f"  {label:>8s}", end="")
-    print()
-    print("-" * (8 + 10 * N_STREAKS))
+def print_policy(policy: EconomyPolicy, enemy_streaks: list[int] | None = None) -> None:
+    """Print the optimal policy as readable tables.
 
-    for b in range(N_MONEY_BINS):
-        money = _bin_to_money(b)
-        print(f"${money:>6d}", end="")
+    Parameters
+    ----------
+    policy : EconomyPolicy
+        Solved policy to display.
+    enemy_streaks : list[int] | None
+        Which enemy streak slices to print.  Defaults to [0, 1, 3]
+        (most strategically distinct scenarios).
+    """
+    if enemy_streaks is None:
+        enemy_streaks = [0, 1, 3]
+
+    for ek in enemy_streaks:
+        ek_label = "Enemy just won" if ek == 0 else f"Enemy lost {ek}"
+        print(f"\nOptimal Buy Policy ({policy.side} side, {ek_label})")
+        print(f"{'Money':>8s}", end="")
         for k in range(N_STREAKS):
-            act = int(policy.policy[b, k])
-            print(f"  {ACTION_NAMES[act]:>8s}", end="")
+            label = f"L{k}" if k > 0 else "W"
+            print(f"  {label:>8s}", end="")
         print()
+        print("-" * (8 + 10 * N_STREAKS))
+
+        for b in range(N_MONEY_BINS):
+            money = _bin_to_money(b)
+            print(f"${money:>6d}", end="")
+            for k in range(N_STREAKS):
+                act = int(policy.policy[b, k, ek])
+                print(f"  {ACTION_NAMES[act]:>8s}", end="")
+            print()
 
 
 if __name__ == "__main__":
     for side in ("T", "CT"):
         policy = solve_economy_mdp(side)
         print_policy(policy)
+        print(f"\n{'='*70}")
+        print(f"  {policy.side} side — State space: {policy.V.shape} "
+              f"({policy.V.size} states)")
+        print(f"{'='*70}")

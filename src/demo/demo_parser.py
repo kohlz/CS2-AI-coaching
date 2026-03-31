@@ -280,9 +280,34 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
         other=["total_rounds_played"],
     )
 
-    freeze_ends = sorted(parser.parse_event("round_freeze_end")["tick"].tolist())
-    round_ends_raw = sorted(parser.parse_event("round_officially_ended")["tick"].tolist())
-    round_ends = sorted(set(round_ends_raw))
+    freeze_ends_raw = sorted(parser.parse_event("round_freeze_end")["tick"].tolist())
+    round_ends_raw = sorted(set(
+        parser.parse_event("round_officially_ended")["tick"].tolist()
+    ))
+
+    # Pair each freeze_end with the first round_end that falls between it
+    # and the next freeze_end.  Unpaired freeze_ends (warmup, knife) are
+    # discarded so that tick ranges never overlap between rounds.
+    # The very last competitive round may lack a round_officially_ended
+    # event (match ends at 13 wins), so we use a fallback tick estimate.
+    freeze_ends: list[int] = []
+    round_ends: list[int] = []
+
+    for i, fe in enumerate(freeze_ends_raw):
+        next_fe = freeze_ends_raw[i + 1] if i + 1 < len(freeze_ends_raw) else float("inf")
+        matched_re = None
+        for re_tick in round_ends_raw:
+            if fe < re_tick <= next_fe:
+                matched_re = re_tick
+                break
+        if matched_re is not None:
+            freeze_ends.append(fe)
+            round_ends.append(matched_re)
+        elif i == len(freeze_ends_raw) - 1 and freeze_ends:
+            # Last freeze_end with no round_end — likely the match-winning
+            # round.  Estimate end as 115 seconds after freeze_end.
+            freeze_ends.append(fe)
+            round_ends.append(fe + 115 * TICK_RATE)
 
     buytime_ended_ticks = sorted(
         parser.parse_event("buytime_ended")["tick"].tolist()
@@ -494,13 +519,26 @@ def _build_round(
         if attacker in att_pool:
             att_pool[attacker].kills += 1
 
-    # Damage totals
+    # Damage totals — only count damage dealt to enemies (not team/self).
+    # Track each victim's HP across hits so that overkill damage is not
+    # counted: actual_dmg = victim_hp_before - health_after.
+    t_names = set(t_players.keys())
+    ct_names = set(ct_players.keys())
+
+    victim_hp: dict[str, int] = {}
     for _, row in rd_hurts.iterrows():
         attacker = row.get("attacker_name", "")
-        dmg = int(row.get("dmg_health", 0))
-        for pool in (t_players, ct_players):
-            if attacker in pool:
-                pool[attacker].damage += dmg
+        victim = row.get("user_name", "")
+        health_after = int(row.get("health", 0))
+
+        hp_before = victim_hp.get(victim, 100)
+        actual_dmg = max(0, hp_before - health_after)
+        victim_hp[victim] = health_after
+
+        if attacker in t_names and victim in ct_names:
+            t_players[attacker].damage += actual_dmg
+        elif attacker in ct_names and victim in t_names:
+            ct_players[attacker].damage += actual_dmg
 
     # Bomb events
     bomb_planted = len(rd_bombs) > 0

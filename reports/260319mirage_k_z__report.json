@@ -1,0 +1,3934 @@
+{
+  "demo_file": "src/demo/260319mirage.dem",
+  "player_name": "k_z_",
+  "map_name": "de_mirage",
+  "match_score": "T 13 - 7 CT",
+  "total_rounds": 20,
+  "overall_grade": "B",
+  "generation_time_sec": 4.81,
+  "economy": {
+    "total_rounds": 16,
+    "fresh_buy_rounds": 5,
+    "team_drop_rounds": 11,
+    "optimal_decisions": 16,
+    "fresh_buy_accuracy": 1.0,
+    "overall_accuracy": 1.0,
+    "mistakes": 0,
+    "over_buys": 0,
+    "under_buys": 0,
+    "mistakes_vs_enemy_eco": 0,
+    "mistakes_vs_enemy_buy": 0,
+    "avg_wp_loss_per_mistake": 0.0,
+    "grade": "A"
+  },
+  "engagement": {
+    "rounds": 20,
+    "kills": 21,
+    "deaths": 11,
+    "kd_ratio": 1.9090909090909092,
+    "adr": 97.75,
+    "opening_duels": 2,
+    "opening_kills": 2,
+    "opening_deaths": 0,
+    "opening_success_rate": 1.0,
+    "trade_opportunities": 53,
+    "successful_trades": 13,
+    "trade_rate": 0.24528301886792453,
+    "avg_trade_time_sec": 2.3489583333333335,
+    "isolated_deaths": 9,
+    "isolated_death_rate": 0.8181818181818182,
+    "multi_kills_2k": 6,
+    "multi_kills_3k": 1,
+    "clutches_won": 0,
+    "clutches_attempted": 5,
+    "avg_util_on_rifle_round": 2.142857142857143,
+    "grade": "B"
+  },
+  "game_sense": {},
+  "nn_predictions": {
+    "available": true,
+    "attack_predictions": [
+      {
+        "round": 0,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.06020866706967354,
+          "B": 0.018404757604002953,
+          "no_plant": 0.9213865399360657
+        }
+      },
+      {
+        "round": 1,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.03803456947207451,
+          "B": 0.06188586726784706,
+          "no_plant": 0.9000795483589172
+        }
+      },
+      {
+        "round": 2,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.02416045404970646,
+          "B": 0.15429110825061798,
+          "no_plant": 0.8215484023094177
+        }
+      },
+      {
+        "round": 3,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 0.02325049415230751,
+          "B": 0.09405657649040222,
+          "no_plant": 0.8826929330825806
+        }
+      },
+      {
+        "round": 4,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.017986346036195755,
+          "B": 0.09257964044809341,
+          "no_plant": 0.8894340395927429
+        }
+      },
+      {
+        "round": 5,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.013622286729514599,
+          "B": 0.09856228530406952,
+          "no_plant": 0.8878154754638672
+        }
+      },
+      {
+        "round": 6,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 0.010595041327178478,
+          "B": 0.14507882297039032,
+          "no_plant": 0.8443261384963989
+        }
+      },
+      {
+        "round": 7,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 0.00988604687154293,
+          "B": 0.13380053639411926,
+          "no_plant": 0.8563134074211121
+        }
+      },
+      {
+        "round": 8,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 0.007722946815192699,
+          "B": 0.09920597821474075,
+          "no_plant": 0.8930709958076477
+        }
+      },
+      {
+        "round": 9,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.008003230206668377,
+          "B": 0.11870057880878448,
+          "no_plant": 0.8732962012290955
+        }
+      },
+      {
+        "round": 10,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 0.007287144660949707,
+          "B": 0.09628637880086899,
+          "no_plant": 0.8964264392852783
+        }
+      },
+      {
+        "round": 11,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.007156004197895527,
+          "B": 0.0652373880147934,
+          "no_plant": 0.9276065826416016
+        }
+      },
+      {
+        "round": 12,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.059949684888124466,
+          "B": 0.018657004460692406,
+          "no_plant": 0.9213933348655701
+        }
+      },
+      {
+        "round": 13,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.04339144751429558,
+          "B": 0.043014008551836014,
+          "no_plant": 0.9135944843292236
+        }
+      },
+      {
+        "round": 14,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.025383245199918747,
+          "B": 0.14033867418766022,
+          "no_plant": 0.8342780470848083
+        }
+      },
+      {
+        "round": 15,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.020096933469176292,
+          "B": 0.18629831075668335,
+          "no_plant": 0.7936046719551086
+        }
+      },
+      {
+        "round": 16,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.016289450228214264,
+          "B": 0.1876160204410553,
+          "no_plant": 0.7960945963859558
+        }
+      },
+      {
+        "round": 17,
+        "predicted": "no_plant",
+        "actual": "A",
+        "correct": false,
+        "probs": {
+          "A": 0.017384976148605347,
+          "B": 0.2257622331380844,
+          "no_plant": 0.7568527460098267
+        }
+      },
+      {
+        "round": 18,
+        "predicted": "no_plant",
+        "actual": "no_plant",
+        "correct": true,
+        "probs": {
+          "A": 0.018024517223238945,
+          "B": 0.22784562408924103,
+          "no_plant": 0.7541297674179077
+        }
+      },
+      {
+        "round": 19,
+        "predicted": "no_plant",
+        "actual": "B",
+        "correct": false,
+        "probs": {
+          "A": 0.011452943086624146,
+          "B": 0.1517677754163742,
+          "no_plant": 0.8367792963981628
+        }
+      }
+    ],
+    "formation_predictions": [
+      {
+        "round": 0,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.027215566486120224,
+          "1-2-2": 9.35795560508268e-06,
+          "1-1-3": 3.139888633540977e-07,
+          "2-2-1": 0.07525776326656342,
+          "3-1-1": 0.05102860555052757,
+          "1-1-2": 0.001329128397628665,
+          "0-2-3": 7.646118547199876e-07,
+          "2-0-3": 6.614179710595636e-07,
+          "other": 0.84515780210495
+        }
+      },
+      {
+        "round": 1,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.0336419902741909,
+          "1-2-2": 8.422670362051576e-06,
+          "1-1-3": 2.1242082937078521e-07,
+          "2-2-1": 0.09139218181371689,
+          "3-1-1": 0.048110805451869965,
+          "1-1-2": 0.000942947983276099,
+          "0-2-3": 5.045670263825741e-07,
+          "2-0-3": 3.8662597034999635e-07,
+          "other": 0.8259025812149048
+        }
+      },
+      {
+        "round": 2,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.05091368407011032,
+          "1-2-2": 1.0461369129188824e-05,
+          "1-1-3": 2.7575944727686874e-07,
+          "2-2-1": 0.08850565552711487,
+          "3-1-1": 0.03364298492670059,
+          "1-1-2": 0.001365083153359592,
+          "0-2-3": 6.418597990887065e-07,
+          "2-0-3": 5.047538138569507e-07,
+          "other": 0.8255607485771179
+        }
+      },
+      {
+        "round": 3,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.06457408517599106,
+          "1-2-2": 9.86483610176947e-06,
+          "1-1-3": 2.0703264169696922e-07,
+          "2-2-1": 0.10232667624950409,
+          "3-1-1": 0.02981867454946041,
+          "1-1-2": 0.001086342497728765,
+          "0-2-3": 4.704279774614406e-07,
+          "2-0-3": 3.3622342243688763e-07,
+          "other": 0.8021834492683411
+        }
+      },
+      {
+        "round": 4,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.09115598350763321,
+          "1-2-2": 1.1089986401202623e-05,
+          "1-1-3": 2.2390706533315097e-07,
+          "2-2-1": 0.10295478999614716,
+          "3-1-1": 0.02206239104270935,
+          "1-1-2": 0.001290086074732244,
+          "0-2-3": 4.979756909051503e-07,
+          "2-0-3": 3.5199261105844926e-07,
+          "other": 0.782524585723877
+        }
+      },
+      {
+        "round": 5,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.10605544596910477,
+          "1-2-2": 1.0615419341775123e-05,
+          "1-1-3": 1.7899576221225288e-07,
+          "2-2-1": 0.11137678474187851,
+          "3-1-1": 0.0200070571154356,
+          "1-1-2": 0.001098203007131815,
+          "0-2-3": 3.9195273870973324e-07,
+          "2-0-3": 2.600962716314825e-07,
+          "other": 0.7614510655403137
+        }
+      },
+      {
+        "round": 6,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.06765136867761612,
+          "1-2-2": 1.1376640031812713e-05,
+          "1-1-3": 1.5272762254880945e-07,
+          "2-2-1": 0.09833979606628418,
+          "3-1-1": 0.02537708543241024,
+          "1-1-2": 0.0009769946336746216,
+          "0-2-3": 3.4874321386269003e-07,
+          "2-0-3": 2.5032414896486443e-07,
+          "other": 0.8076426386833191
+        }
+      },
+      {
+        "round": 7,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.11353873461484909,
+          "1-2-2": 1.4180807738739531e-05,
+          "1-1-3": 1.9205137391509197e-07,
+          "2-2-1": 0.09617509692907333,
+          "3-1-1": 0.015500364825129509,
+          "1-1-2": 0.0013721950817853212,
+          "0-2-3": 4.253813870036538e-07,
+          "2-0-3": 3.078622512475704e-07,
+          "other": 0.7733983397483826
+        }
+      },
+      {
+        "round": 8,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.0675479993224144,
+          "1-2-2": 1.5031357179395854e-05,
+          "1-1-3": 1.5933795793898753e-07,
+          "2-2-1": 0.08428363502025604,
+          "3-1-1": 0.02071874402463436,
+          "1-1-2": 0.0011811420554295182,
+          "0-2-3": 3.699450417116168e-07,
+          "2-0-3": 2.910757643803663e-07,
+          "other": 0.8262526988983154
+        }
+      },
+      {
+        "round": 9,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.04639359936118126,
+          "1-2-2": 1.603544660611078e-05,
+          "1-1-3": 1.3926189978974435e-07,
+          "2-2-1": 0.07342686504125595,
+          "3-1-1": 0.024122927337884903,
+          "1-1-2": 0.0010894841980189085,
+          "0-2-3": 3.3486779216218565e-07,
+          "2-0-3": 2.838634998170164e-07,
+          "other": 0.8549503087997437
+        }
+      },
+      {
+        "round": 10,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.027000168338418007,
+          "1-2-2": 1.6277050235657953e-05,
+          "1-1-3": 1.1233762364781796e-07,
+          "2-2-1": 0.06098220497369766,
+          "3-1-1": 0.030984045937657356,
+          "1-1-2": 0.0009347521699965,
+          "0-2-3": 2.825528042649239e-07,
+          "2-0-3": 2.6081292503477016e-07,
+          "other": 0.8800818920135498
+        }
+      },
+      {
+        "round": 11,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.022720301523804665,
+          "1-2-2": 1.73782082129037e-05,
+          "1-1-3": 1.0873438327507756e-07,
+          "2-2-1": 0.050674404948949814,
+          "3-1-1": 0.031159093603491783,
+          "1-1-2": 0.0010429128305986524,
+          "0-2-3": 2.7819098136205866e-07,
+          "2-0-3": 2.769447462469543e-07,
+          "other": 0.8943852186203003
+        }
+      },
+      {
+        "round": 12,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.027502886950969696,
+          "1-2-2": 9.513844815955963e-06,
+          "1-1-3": 3.2455702125844255e-07,
+          "2-2-1": 0.07442992925643921,
+          "3-1-1": 0.05028366297483444,
+          "1-1-2": 0.0013781175948679447,
+          "0-2-3": 7.905286452114524e-07,
+          "2-0-3": 6.889191013215168e-07,
+          "other": 0.8463941216468811
+        }
+      },
+      {
+        "round": 13,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.03544330969452858,
+          "1-2-2": 9.14157135412097e-06,
+          "1-1-3": 2.5023658167810936e-07,
+          "2-2-1": 0.08655475080013275,
+          "3-1-1": 0.04475078731775284,
+          "1-1-2": 0.0011279176687821746,
+          "0-2-3": 5.950704462520662e-07,
+          "2-0-3": 4.729641887024627e-07,
+          "other": 0.8321127891540527
+        }
+      },
+      {
+        "round": 14,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.05205151066184044,
+          "1-2-2": 1.0836211913556326e-05,
+          "1-1-3": 2.9613747187795525e-07,
+          "2-2-1": 0.08633539080619812,
+          "3-1-1": 0.032558623701334,
+          "1-1-2": 0.0014758576871827245,
+          "0-2-3": 6.89637772666174e-07,
+          "2-0-3": 5.51136452031642e-07,
+          "other": 0.8275662660598755
+        }
+      },
+      {
+        "round": 15,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.06676612794399261,
+          "1-2-2": 1.0404010936326813e-05,
+          "1-1-3": 2.306065454149575e-07,
+          "2-2-1": 0.09854616969823837,
+          "3-1-1": 0.028374167159199715,
+          "1-1-2": 0.001222427235916257,
+          "0-2-3": 5.243910550234432e-07,
+          "2-0-3": 3.8404581914619484e-07,
+          "other": 0.8050795793533325
+        }
+      },
+      {
+        "round": 16,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.09527118504047394,
+          "1-2-2": 1.1911022738786414e-05,
+          "1-1-3": 2.5924106239472167e-07,
+          "2-2-1": 0.09759064763784409,
+          "3-1-1": 0.020570378750562668,
+          "1-1-2": 0.0015147379599511623,
+          "0-2-3": 5.771635755991156e-07,
+          "2-0-3": 4.2187949134131486e-07,
+          "other": 0.7850399017333984
+        }
+      },
+      {
+        "round": 17,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.12675809860229492,
+          "1-2-2": 1.2267998499737587e-05,
+          "1-1-3": 2.375896883677342e-07,
+          "2-2-1": 0.10242842137813568,
+          "3-1-1": 0.01615149714052677,
+          "1-1-2": 0.0015023293672129512,
+          "0-2-3": 5.171748966859013e-07,
+          "2-0-3": 3.610648775520531e-07,
+          "other": 0.7531463503837585
+        }
+      },
+      {
+        "round": 18,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.16259990632534027,
+          "1-2-2": 1.2658443665714003e-05,
+          "1-1-3": 2.1534071947826305e-07,
+          "2-2-1": 0.10553865879774094,
+          "3-1-1": 0.012666173279285431,
+          "1-1-2": 0.0014707990922033787,
+          "0-2-3": 4.5955255245644366e-07,
+          "2-0-3": 3.086119590989256e-07,
+          "other": 0.7177107930183411
+        }
+      },
+      {
+        "round": 19,
+        "predicted": "other",
+        "probs": {
+          "2-1-2": 0.1594855636358261,
+          "1-2-2": 1.4696020116389263e-05,
+          "1-1-3": 2.1744945399859716e-07,
+          "2-2-1": 0.0978502705693245,
+          "3-1-1": 0.011567745357751846,
+          "1-1-2": 0.001594490371644497,
+          "0-2-3": 4.6882848891982576e-07,
+          "2-0-3": 3.3058950066333637e-07,
+          "other": 0.7294862270355225
+        }
+      }
+    ],
+    "attack_accuracy": 0.3,
+    "win_pred_accuracy": 0.55
+  },
+  "coaching_tips": [
+    "Positioning: 82% of your deaths were isolated (no teammate could trade).  Stay closer to teammates or hold positions where trades are possible.",
+    "Teamplay: Your trade rate is only 25% \u2014 when a teammate dies, try to refrag within 5 seconds."
+  ],
+  "round_details": [
+    {
+      "round": 0,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade",
+          "1v5 clutch attempt"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly.",
+          "1v5 clutch attempt \u2014 tough situation. If the round is unwinnable, consider saving your weapon for next round.",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team.",
+          "[NN] Round win probability: 47% for your side \u2014 roughly even, execute your role cleanly.",
+          "[NN] T-side is 77% likely to hit A vs 23% B \u2014 consider anchoring A or having utility ready for A."
+        ],
+        "timeline": [
+          {
+            "time_sec": 8.140625,
+            "tick": 5846,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 8.140625,
+            "tick": 5846,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 9.625,
+            "tick": 5941,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=27% B=23% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 14.859375,
+            "tick": 6276,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "A=17% B=81% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 14.859375,
+            "tick": 6276,
+            "source": "RL",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "TRADE (Q=+10.49) \u2014 Move to refrag a fallen teammate [early, 4v5, you at MID]"
+          },
+          {
+            "time_sec": 18.90625,
+            "tick": 6535,
+            "source": "RL",
+            "trigger": "CT HE @ MID",
+            "text": "UTILITY (Q=+10.43) \u2014 Use utility (flash/smoke) to control space [early, 4v5, you at MID]"
+          },
+          {
+            "time_sec": 19.453125,
+            "tick": 6570,
+            "source": "RL",
+            "trigger": "CT kills T @ B (elite)",
+            "text": "FALL_BACK (Q=+8.15) \u2014 Fall back to a safer crossfire angle [early, 4v4, you at MID]"
+          },
+          {
+            "time_sec": 20.578125,
+            "tick": 6642,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (glock)",
+            "text": "A=7% B=93% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 20.578125,
+            "tick": 6642,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (glock)",
+            "text": "TRADE (Q=+10.49) \u2014 Move to refrag a fallen teammate [early, 3v4, you at MID]"
+          },
+          {
+            "time_sec": 24.796875,
+            "tick": 6912,
+            "source": "RL",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "PEEK (Q=+6.78) \u2014 Push for info or an aggressive peek [early, 2v4, you at B]"
+          },
+          {
+            "time_sec": 28.125,
+            "tick": 7125,
+            "source": "RL",
+            "trigger": "Bomb planted B",
+            "text": "TRADE (Q=+6.68) \u2014 Push to trade the entry fragger [post-plant, 2v3, you at B]"
+          },
+          {
+            "time_sec": 30.71875,
+            "tick": 7291,
+            "source": "RL",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "HOLD (Q=+6.60) \u2014 Wait for teammates to group for retake [post-plant, 1v3, you at B]"
+          },
+          {
+            "time_sec": 38.609375,
+            "tick": 7796,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "A=0% B=100% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 38.609375,
+            "tick": 7796,
+            "source": "EVENT",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "You died \u2014 round over for you"
+          }
+        ],
+        "outcome": "Round lost. No impact this round."
+      }
+    },
+    {
+      "round": 1,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 1,
+      "deaths": 1,
+      "damage": 100,
+      "engagement": {
+        "opening_kill": true,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Won opening duel",
+          "Died without trade",
+          "1v4 clutch attempt"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly.",
+          "Great opening frag \u2014 first blood gives your team a huge advantage.",
+          "1v4 clutch attempt \u2014 tough situation. If the round is unwinnable, consider saving your weapon for next round.",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "[NN] Round win probability: 52% for your side \u2014 roughly even, execute your role cleanly.",
+          "[NN] Attack probability is split (A: 38%, B: 62%) \u2014 stay in your default position and wait for info."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.078125,
+            "tick": 9977,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 7.078125,
+            "tick": 9977,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 10.140625,
+            "tick": 10173,
+            "source": "LSTM",
+            "trigger": "CT HE @ MID",
+            "text": "A=26% B=22% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 11.6875,
+            "tick": 10272,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (deagle)",
+            "text": "FALL_BACK (Q=+7.77) \u2014 Fall back to a safer crossfire angle [early, 5v4, you at MID]"
+          },
+          {
+            "time_sec": 14.921875,
+            "tick": 10479,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (galilar)",
+            "text": "A=52% B=43% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 14.921875,
+            "tick": 10479,
+            "source": "RL",
+            "trigger": "T kills CT @ A (galilar)",
+            "text": "UTILITY (Q=+10.32) \u2014 Use utility (flash/smoke) to control space [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 17.59375,
+            "tick": 10650,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (mac10)",
+            "text": "A=64% B=34% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 17.59375,
+            "tick": 10650,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (mac10)",
+            "text": "TRADE (Q=+10.32) \u2014 Move to refrag a fallen teammate [early, 3v4, you at A]"
+          },
+          {
+            "time_sec": 20.109375,
+            "tick": 10811,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (glock)",
+            "text": "A=78% B=21% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 24.15625,
+            "tick": 11070,
+            "source": "LSTM",
+            "trigger": "T HE @ A",
+            "text": "A=94% B=5% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 24.15625,
+            "tick": 11070,
+            "source": "RL",
+            "trigger": "T HE @ A",
+            "text": "PEEK (Q=+0.00) \u2014 Push for info or an aggressive peek [early, 2v4, you at MID]"
+          },
+          {
+            "time_sec": 25.859375,
+            "tick": 11179,
+            "source": "RL",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "HOLD (Q=+8.36) \u2014 Hold your position and wait for contact [early, 1v4, you at MID]"
+          },
+          {
+            "time_sec": 31.5625,
+            "tick": 11544,
+            "source": "EVENT",
+            "trigger": "T kills CT @ MID (mac10)",
+            "text": "You died \u2014 round over for you"
+          },
+          {
+            "time_sec": 35.890625,
+            "tick": 11821,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          }
+        ],
+        "outcome": "Round lost. You had 1K 100DMG."
+      }
+    },
+    {
+      "round": 2,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "You died but a teammate traded the kill \u2014 acceptable if you gained info or map control.",
+          "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team.",
+          "[NN] Round win probability: 36% for your side (T favored) \u2014 play for trades, avoid isolated fights.",
+          "[NN] T-side is 86% likely to hit B vs 14% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 5.828125,
+            "tick": 13645,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=41% B=28% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 5.828125,
+            "tick": 13645,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 7.4375,
+            "tick": 13748,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=93% B=4% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 11.671875,
+            "tick": 14019,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=10% B=9% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 13.09375,
+            "tick": 14110,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (galilar)",
+            "text": "A=0% B=0% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 17.28125,
+            "tick": 14378,
+            "source": "EVENT",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "You died \u2014 round over for you"
+          },
+          {
+            "time_sec": 30.078125,
+            "tick": 15197,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 71.078125,
+            "tick": 17821,
+            "source": "LSTM",
+            "trigger": " kills CT @ A (planted_c4)",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          }
+        ],
+        "outcome": "Round lost. No impact this round."
+      }
+    },
+    {
+      "round": 3,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 2,
+      "deaths": 1,
+      "damage": 200,
+      "economy": {
+        "money": 1900,
+        "action": "FORCE",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$7319 (FULL BUY with rifles, 43% confidence)",
+        "enemy_tier": "HIGH",
+        "enemy_money": 7319,
+        "weapon_matchup": "SMG vs predicted full buy \u2014 outgunned at range",
+        "team_avg_money": 1600,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 2,
+        "clutch": false,
+        "notes": [
+          "2K round",
+          "Died without trade",
+          "1v5 clutch attempt"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FORCE at $1900).",
+          "[Economy HMM] Enemy ~$7319 (FULL BUY with rifles, 43% confidence)",
+          "[Weapon Matchup] SMG vs predicted full buy \u2014 outgunned at range",
+          "[Team Econ] Team avg $1600 \u2014 team cannot full buy next round",
+          "1v5 clutch attempt \u2014 tough situation. If the round is unwinnable, consider saving your weapon for next round.",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "[NN] Round win probability: 61% for your side (CT favored) \u2014 you have economy/position advantage, play default and use utility.",
+          "[NN] T-side is 80% likely to hit B vs 20% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.78125,
+            "tick": 20047,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=30% B=24% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 7.78125,
+            "tick": 20047,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 12.28125,
+            "tick": 20335,
+            "source": "LSTM",
+            "trigger": "CT smoke @ A",
+            "text": "A=18% B=15% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 16.859375,
+            "tick": 20628,
+            "source": "LSTM",
+            "trigger": "T HE @ MID",
+            "text": "A=10% B=8% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 30.015625,
+            "tick": 21470,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=4% B=3% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 32.328125,
+            "tick": 21618,
+            "source": "RL",
+            "trigger": "T HE @ MID",
+            "text": "UTILITY (Q=+9.63) \u2014 Use utility (flash/smoke) to control space [mid-round, 5v5, you at CT_BASE]"
+          },
+          {
+            "time_sec": 32.609375,
+            "tick": 21636,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "A=16% B=13% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 32.609375,
+            "tick": 21636,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "HOLD (Q=+8.81) \u2014 Hold your position and wait for contact [mid-round, 4v5, you at CT_BASE]"
+          },
+          {
+            "time_sec": 41.46875,
+            "tick": 22203,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (mp9)",
+            "text": "TRADE (Q=+10.53) \u2014 Move to refrag a fallen teammate [mid-round, 4v4, you at A]"
+          },
+          {
+            "time_sec": 43.828125,
+            "tick": 22354,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "A=21% B=36% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 46.3125,
+            "tick": 22513,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=3% B=96% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 46.3125,
+            "tick": 22513,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "HOLD (Q=+6.82) \u2014 Hold your position and wait for contact [mid-round, 2v4, you at MID]"
+          },
+          {
+            "time_sec": 48.375,
+            "tick": 22645,
+            "source": "RL",
+            "trigger": "CT kills T @ B (mp9)",
+            "text": "FALL_BACK (Q=+10.84) \u2014 Fall back to a safer crossfire angle [mid-round, 2v3, you at MID]"
+          },
+          {
+            "time_sec": 55.578125,
+            "tick": 23106,
+            "source": "RL",
+            "trigger": "T HE @ B",
+            "text": "TRADE (Q=+8.94) \u2014 Move to refrag a fallen teammate [mid-round, 2v3, you at MID]"
+          },
+          {
+            "time_sec": 58.71875,
+            "tick": 23307,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (ak47)",
+            "text": "HOLD (Q=+7.69) \u2014 Hold your position and wait for contact [mid-round, 2v2, you at MID]"
+          },
+          {
+            "time_sec": 59.046875,
+            "tick": 23328,
+            "source": "RL",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "TRADE (Q=+9.17) \u2014 Move to refrag a fallen teammate [mid-round, 1v2, you at MID]"
+          },
+          {
+            "time_sec": 68.640625,
+            "tick": 23942,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "A=0% B=100% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 68.640625,
+            "tick": 23942,
+            "source": "EVENT",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "You died \u2014 round over for you"
+          }
+        ],
+        "outcome": "Round lost. You had 2K 200DMG."
+      }
+    },
+    {
+      "round": 4,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "economy": {
+        "money": 2000,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$7899 (FULL BUY with AWP possible, 48% confidence)",
+        "enemy_tier": "RICH",
+        "enemy_money": 7899,
+        "weapon_matchup": "",
+        "team_avg_money": 830,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $2000).",
+          "[Economy HMM] Enemy ~$7899 (FULL BUY with AWP possible, 48% confidence)",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "[Team Econ] Team avg $830 \u2014 team cannot full buy next round",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team.",
+          "[NN] Round win probability: 63% for your side (CT favored) \u2014 you have economy/position advantage, play default and use utility.",
+          "[NN] T-side is 84% likely to hit B vs 16% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 5.34375,
+            "tick": 26012,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=41% B=28% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 5.34375,
+            "tick": 26012,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+7.94) \u2014 Push for info or an aggressive peek [early, 5v5, you at B]"
+          },
+          {
+            "time_sec": 8.78125,
+            "tick": 26232,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=85% B=11% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 8.78125,
+            "tick": 26232,
+            "source": "LSTM",
+            "trigger": "T HE @ A",
+            "text": "A=98% B=1% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 10.484375,
+            "tick": 26341,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (xm1014)",
+            "text": "A=45% B=21% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 10.484375,
+            "tick": 26341,
+            "source": "RL",
+            "trigger": "CT kills T @ A (xm1014)",
+            "text": "ROTATE (Q=+7.42) \u2014 Rotate toward the active site [early, 5v4, you at B]"
+          },
+          {
+            "time_sec": 11.953125,
+            "tick": 26435,
+            "source": "LSTM",
+            "trigger": "CT smoke @ MID",
+            "text": "A=64% B=24% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 16.234375,
+            "tick": 26709,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=97% B=2% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 16.234375,
+            "tick": 26709,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "HOLD (Q=+8.31) \u2014 Hold your position and wait for contact [early, 4v4, you at B]"
+          },
+          {
+            "time_sec": 16.546875,
+            "tick": 26729,
+            "source": "RL",
+            "trigger": "CT HE @ A",
+            "text": "PEEK (Q=+7.94) \u2014 Push for info or an aggressive peek [early, 4v4, you at B]"
+          },
+          {
+            "time_sec": 17.6875,
+            "tick": 26802,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=40% B=17% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 19.234375,
+            "tick": 26901,
+            "source": "LSTM",
+            "trigger": "CT smoke @ MID",
+            "text": "A=23% B=12% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 27.0,
+            "tick": 27398,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=17% B=2% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 36.109375,
+            "tick": 27981,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=65% B=3% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 36.109375,
+            "tick": 27981,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "TRADE (Q=+8.81) \u2014 Move to refrag a fallen teammate [mid-round, 3v4, you at B]"
+          },
+          {
+            "time_sec": 37.453125,
+            "tick": 28067,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=6% B=1% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 40.0,
+            "tick": 28230,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=26% B=3% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 40.0,
+            "tick": 28230,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "PEEK (Q=+7.77) \u2014 Push for info or an aggressive peek [mid-round, 3v3, you at B]"
+          },
+          {
+            "time_sec": 41.609375,
+            "tick": 28333,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "A=3% B=0% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 41.609375,
+            "tick": 28333,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "ROTATE (Q=+7.56) \u2014 Rotate toward the active site [mid-round, 3v2, you at B]"
+          },
+          {
+            "time_sec": 47.265625,
+            "tick": 28695,
+            "source": "LSTM",
+            "trigger": "T flash @ B",
+            "text": "A=84% B=2% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 47.265625,
+            "tick": 28695,
+            "source": "RL",
+            "trigger": "T flash @ B",
+            "text": "FALL_BACK (Q=+7.60) \u2014 Fall back to a safer crossfire angle [mid-round, 3v2, you at MID]"
+          },
+          {
+            "time_sec": 52.640625,
+            "tick": 29039,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (awp)",
+            "text": "A=0% B=99% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 52.640625,
+            "tick": 29039,
+            "source": "EVENT",
+            "trigger": "T kills CT @ B (awp)",
+            "text": "You died \u2014 round over for you"
+          },
+          {
+            "time_sec": 89.84375,
+            "tick": 31420,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (hkp2000)",
+            "text": "A=0% B=100% \u2014 B attack likely \u2014 rotate/stack B"
+          }
+        ],
+        "outcome": "Round won. No impact this round."
+      }
+    },
+    {
+      "round": 5,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 109,
+      "economy": {
+        "money": 3250,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$5720 (FULL BUY with rifles, 34% confidence)",
+        "enemy_tier": "HIGH",
+        "enemy_money": 5720,
+        "weapon_matchup": "AWP vs full buy \u2014 strong pick potential",
+        "team_avg_money": 1670,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $3250).",
+          "[Economy HMM] Enemy ~$5720 (FULL BUY with rifles, 34% confidence)",
+          "[Weapon Matchup] AWP vs full buy \u2014 strong pick potential",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "[Team Econ] Team avg $1670 \u2014 team cannot full buy next round",
+          "[NN] Round win probability: 64% for your side (CT favored) \u2014 you have economy/position advantage, play default and use utility.",
+          "[NN] T-side is 88% likely to hit B vs 12% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 8.140625,
+            "tick": 34413,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 8.140625,
+            "tick": 34413,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 10.640625,
+            "tick": 34573,
+            "source": "LSTM",
+            "trigger": "CT smoke @ MID",
+            "text": "A=25% B=21% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 11.765625,
+            "tick": 34645,
+            "source": "LSTM",
+            "trigger": "CT smoke @ B",
+            "text": "A=10% B=8% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 16.140625,
+            "tick": 34925,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=21% B=18% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 20.78125,
+            "tick": 35222,
+            "source": "LSTM",
+            "trigger": "T HE @ A",
+            "text": "A=54% B=39% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 21.21875,
+            "tick": 35250,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=90% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 21.484375,
+            "tick": 35267,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "UTILITY (Q=+8.22) \u2014 Use utility (flash/smoke) to control space [early, 5v4, you at A]"
+          },
+          {
+            "time_sec": 21.96875,
+            "tick": 35298,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "HOLD (Q=+8.23) \u2014 Hold your position and wait for contact [early, 5v4, you at A]"
+          },
+          {
+            "time_sec": 23.359375,
+            "tick": 35387,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 23.359375,
+            "tick": 35387,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "UTILITY (Q=+10.32) \u2014 Use utility (flash/smoke) to control space [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 23.859375,
+            "tick": 35419,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "TRADE (Q=+10.32) \u2014 Move to refrag a fallen teammate [early, 3v4, you at A]"
+          },
+          {
+            "time_sec": 24.71875,
+            "tick": 35474,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (awp)",
+            "text": "A=18% B=1% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 24.71875,
+            "tick": 35474,
+            "source": "RL",
+            "trigger": "CT kills T @ A (awp)",
+            "text": "UTILITY (Q=+10.87) \u2014 Use utility (flash/smoke) to control space [early, 3v3, you at A]"
+          },
+          {
+            "time_sec": 26.453125,
+            "tick": 35585,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 26.453125,
+            "tick": 35585,
+            "source": "RL",
+            "trigger": "Bomb planted A",
+            "text": "HOLD (Q=+12.59) \u2014 Wait for teammates to group for retake [post-plant, 3v3, you at A]"
+          },
+          {
+            "time_sec": 26.859375,
+            "tick": 35611,
+            "source": "RL",
+            "trigger": "CT smoke @ A",
+            "text": "TRADE (Q=+13.32) \u2014 Push to trade the entry fragger [post-plant, 3v3, you at A]"
+          },
+          {
+            "time_sec": 36.09375,
+            "tick": 36202,
+            "source": "RL",
+            "trigger": "CT HE @ A",
+            "text": "HOLD (Q=+13.24) \u2014 Wait for teammates to group for retake [post-plant, 3v2, you at A]"
+          },
+          {
+            "time_sec": 38.484375,
+            "tick": 36355,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (ak47)",
+            "text": "TRADE (Q=+10.90) \u2014 Push to trade the entry fragger [post-plant, 3v1, you at A]"
+          },
+          {
+            "time_sec": 47.6875,
+            "tick": 36944,
+            "source": "RL",
+            "trigger": "CT flash @ MID",
+            "text": "HOLD (Q=+10.44) \u2014 Wait for teammates to group for retake [post-plant, 3v1, you at A]"
+          },
+          {
+            "time_sec": 48.921875,
+            "tick": 37023,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 48.921875,
+            "tick": 37023,
+            "source": "RL",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "TRADE (Q=+10.90) \u2014 Push to trade the entry fragger [post-plant, 3v1, you at A]"
+          }
+        ],
+        "outcome": "Round won. You had 1K 109DMG."
+      }
+    },
+    {
+      "round": 6,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 2,
+      "deaths": 1,
+      "damage": 200,
+      "economy": {
+        "money": 5150,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$4071 (FORCE buy or light rifles, 46% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 4071,
+        "weapon_matchup": "",
+        "team_avg_money": 2960,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 2,
+        "clutch": false,
+        "notes": [
+          "2K round",
+          "Died without trade",
+          "1v5 clutch attempt"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $5150).",
+          "[Economy HMM] Enemy ~$4071 (FORCE buy or light rifles, 46% confidence)",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "[Team Econ] Team avg $2960 \u2014 team cannot full buy next round",
+          "1v5 clutch attempt \u2014 tough situation. If the round is unwinnable, consider saving your weapon for next round.",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "[NN] Round win probability: 98% for your side (CT favored) \u2014 you have economy/position advantage, play default and use utility.",
+          "[NN] T-side is 93% likely to hit B vs 7% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.90625,
+            "tick": 39949,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 7.90625,
+            "tick": 39949,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 10.953125,
+            "tick": 40144,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=27% B=22% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 12.34375,
+            "tick": 40233,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 13.578125,
+            "tick": 40312,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=19% B=16% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 16.078125,
+            "tick": 40472,
+            "source": "LSTM",
+            "trigger": "CT HE @ B",
+            "text": "A=8% B=6% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 16.140625,
+            "tick": 40476,
+            "source": "LSTM",
+            "trigger": "CT HE @ B",
+            "text": "A=0% B=0% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 17.171875,
+            "tick": 40542,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (deagle)",
+            "text": "A=0% B=99% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 20.578125,
+            "tick": 40760,
+            "source": "RL",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "UTILITY (Q=+10.87) \u2014 Use utility (flash/smoke) to control space [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 20.90625,
+            "tick": 40781,
+            "source": "RL",
+            "trigger": "CT smoke @ B",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 25.875,
+            "tick": 41099,
+            "source": "RL",
+            "trigger": "T kills CT @ B (deagle)",
+            "text": "PEEK (Q=+8.17) \u2014 Push for info or an aggressive peek [early, 3v4, you at CT_BASE]"
+          },
+          {
+            "time_sec": 30.875,
+            "tick": 41419,
+            "source": "RL",
+            "trigger": "CT kills T @ B (awp)",
+            "text": "HOLD (Q=+7.69) \u2014 Hold your position and wait for contact [mid-round, 3v3, you at MID]"
+          },
+          {
+            "time_sec": 34.6875,
+            "tick": 41663,
+            "source": "RL",
+            "trigger": "T flash @ B",
+            "text": "FALL_BACK (Q=+8.14) \u2014 Fall back to a safer crossfire angle [mid-round, 3v3, you at MID]"
+          },
+          {
+            "time_sec": 37.890625,
+            "tick": 41868,
+            "source": "RL",
+            "trigger": "CT flash @ B",
+            "text": "PEEK (Q=+7.77) \u2014 Push for info or an aggressive peek [mid-round, 3v3, you at B]"
+          },
+          {
+            "time_sec": 39.15625,
+            "tick": 41949,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (deagle)",
+            "text": "A=2% B=89% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 39.15625,
+            "tick": 41949,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (deagle)",
+            "text": "TRADE (Q=+8.81) \u2014 Move to refrag a fallen teammate [mid-round, 2v3, you at B]"
+          },
+          {
+            "time_sec": 42.484375,
+            "tick": 42162,
+            "source": "RL",
+            "trigger": "T kills CT @ B (m4a1_silencer)",
+            "text": "HOLD (Q=+6.66) \u2014 Hold your position and wait for contact [mid-round, 1v3, you at B]"
+          },
+          {
+            "time_sec": 47.515625,
+            "tick": 42484,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "A=1% B=89% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 47.515625,
+            "tick": 42484,
+            "source": "EVENT",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "You died \u2014 round over for you"
+          }
+        ],
+        "outcome": "Round lost. You had 2K 200DMG."
+      }
+    },
+    {
+      "round": 7,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 3,
+      "deaths": 0,
+      "damage": 300,
+      "economy": {
+        "money": 3250,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$6874 (FULL BUY with rifles, 50% confidence)",
+        "enemy_tier": "HIGH",
+        "enemy_money": 6874,
+        "weapon_matchup": "",
+        "team_avg_money": 1330,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 3,
+        "clutch": false,
+        "notes": [
+          "3K round"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $3250).",
+          "[Economy HMM] Enemy ~$6874 (FULL BUY with rifles, 50% confidence)",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "[Team Econ] Team avg $1330 \u2014 team cannot full buy next round",
+          "Impact round with 3 kills and 300 damage!",
+          "[NN] Round win probability: 22% for your side (T favored) \u2014 play for trades, avoid isolated fights.",
+          "[NN] T-side is 93% likely to hit B vs 7% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.21875,
+            "tick": 44674,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 7.21875,
+            "tick": 44674,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 9.0,
+            "tick": 44788,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=27% B=23% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 9.40625,
+            "tick": 44814,
+            "source": "RL",
+            "trigger": "CT HE @ A",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 10.453125,
+            "tick": 44881,
+            "source": "LSTM",
+            "trigger": "CT smoke @ A",
+            "text": "A=18% B=15% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 14.046875,
+            "tick": 45111,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=11% B=9% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 14.734375,
+            "tick": 45155,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "A=24% B=20% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 14.734375,
+            "tick": 45155,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "TRADE (Q=+10.49) \u2014 Move to refrag a fallen teammate [early, 4v5, you at MID]"
+          },
+          {
+            "time_sec": 15.734375,
+            "tick": 45219,
+            "source": "RL",
+            "trigger": "CT smoke @ B",
+            "text": "UTILITY (Q=+10.43) \u2014 Use utility (flash/smoke) to control space [early, 4v5, you at MID]"
+          },
+          {
+            "time_sec": 17.4375,
+            "tick": 45328,
+            "source": "LSTM",
+            "trigger": "CT HE @ MID",
+            "text": "A=12% B=9% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 17.59375,
+            "tick": 45338,
+            "source": "LSTM",
+            "trigger": "CT HE @ MID",
+            "text": "A=6% B=4% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 18.53125,
+            "tick": 45398,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "FALL_BACK (Q=+8.15) \u2014 Fall back to a safer crossfire angle [early, 4v4, you at MID]"
+          },
+          {
+            "time_sec": 19.78125,
+            "tick": 45478,
+            "source": "LSTM",
+            "trigger": "T flash @ B",
+            "text": "A=18% B=14% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 19.84375,
+            "tick": 45482,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "A=0% B=0% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 23.78125,
+            "tick": 45734,
+            "source": "LSTM",
+            "trigger": "T HE @ A",
+            "text": "A=33% B=20% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 23.78125,
+            "tick": 45734,
+            "source": "RL",
+            "trigger": "T HE @ A",
+            "text": "HOLD (Q=+8.23) \u2014 Hold your position and wait for contact [early, 4v3, you at A]"
+          },
+          {
+            "time_sec": 26.109375,
+            "tick": 45883,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "A=9% B=56% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 26.109375,
+            "tick": 45883,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "UTILITY (Q=+10.32) \u2014 Use utility (flash/smoke) to control space [early, 3v3, you at A]"
+          },
+          {
+            "time_sec": 31.375,
+            "tick": 46220,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "TRADE (Q=+8.20) \u2014 Move to refrag a fallen teammate [mid-round, 3v2, you at A]"
+          },
+          {
+            "time_sec": 32.484375,
+            "tick": 46291,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "A=35% B=44% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 32.484375,
+            "tick": 46291,
+            "source": "RL",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "ROTATE (Q=+6.95) \u2014 Rotate toward the active site [mid-round, 3v1, you at A]"
+          },
+          {
+            "time_sec": 38.09375,
+            "tick": 46650,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "A=39% B=44% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 38.09375,
+            "tick": 46650,
+            "source": "RL",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "TRADE (Q=+7.29) \u2014 Move to refrag a fallen teammate [mid-round, 3v1, you at MID]"
+          }
+        ],
+        "outcome": "Round won. You had 3K 300DMG."
+      }
+    },
+    {
+      "round": 8,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 100,
+      "economy": {
+        "money": 5950,
+        "action": "FULL_BUY",
+        "optimal": "FULL_BUY",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$3492 (FORCE buy or light rifles, 41% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 3492,
+        "weapon_matchup": "",
+        "team_avg_money": 2830,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $5950).",
+          "[Economy HMM] Enemy ~$3492 (FORCE buy or light rifles, 41% confidence)",
+          "[Team Econ] Team avg $2830 \u2014 team cannot full buy next round",
+          "[NN] Round win probability: 2% for your side (T favored) \u2014 play for trades, avoid isolated fights.",
+          "[NN] T-side is 93% likely to hit B vs 7% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.109375,
+            "tick": 48833,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 7.109375,
+            "tick": 48833,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 8.640625,
+            "tick": 48931,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=27% B=22% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 9.109375,
+            "tick": 48961,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=16% B=13% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 9.109375,
+            "tick": 48961,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 11.390625,
+            "tick": 49107,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=8% B=6% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 13.140625,
+            "tick": 49219,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "PEEK (Q=+7.94) \u2014 Push for info or an aggressive peek [early, 5v5, you at B]"
+          },
+          {
+            "time_sec": 13.296875,
+            "tick": 49229,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "A=1% B=1% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 13.296875,
+            "tick": 49229,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "ROTATE (Q=+7.42) \u2014 Rotate toward the active site [early, 5v4, you at B]"
+          },
+          {
+            "time_sec": 14.75,
+            "tick": 49322,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (awp)",
+            "text": "TRADE (Q=+9.23) \u2014 Move to refrag a fallen teammate [early, 5v3, you at B]"
+          },
+          {
+            "time_sec": 16.140625,
+            "tick": 49411,
+            "source": "RL",
+            "trigger": "CT smoke @ B",
+            "text": "HOLD (Q=+5.12) \u2014 Hold your position and wait for contact [early, 5v3, you at B]"
+          },
+          {
+            "time_sec": 17.0,
+            "tick": 49466,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (deagle)",
+            "text": "UTILITY (Q=+7.38) \u2014 Use utility (flash/smoke) to control space [early, 4v3, you at B]"
+          },
+          {
+            "time_sec": 17.828125,
+            "tick": 49519,
+            "source": "RL",
+            "trigger": "T HE @ A",
+            "text": "HOLD (Q=+8.23) \u2014 Hold your position and wait for contact [early, 4v3, you at A]"
+          },
+          {
+            "time_sec": 21.265625,
+            "tick": 49739,
+            "source": "RL",
+            "trigger": "CT HE @ MID",
+            "text": "ROTATE (Q=+6.61) \u2014 Rotate toward the active site [early, 4v3, you at B]"
+          },
+          {
+            "time_sec": 27.59375,
+            "tick": 50144,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "FALL_BACK (Q=+7.61) \u2014 Fall back to a safer crossfire angle [early, 4v3, you at MID]"
+          },
+          {
+            "time_sec": 33.21875,
+            "tick": 50504,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "TRADE (Q=+8.07) \u2014 Move to refrag a fallen teammate [mid-round, 3v2, you at MID]"
+          },
+          {
+            "time_sec": 35.625,
+            "tick": 50658,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=48% B=4% \u2014 likely default/slow round"
+          },
+          {
+            "time_sec": 35.625,
+            "tick": 50658,
+            "source": "RL",
+            "trigger": "CT flash @ MID",
+            "text": "PEEK (Q=+7.16) \u2014 Push for info or an aggressive peek [mid-round, 3v2, you at B]"
+          },
+          {
+            "time_sec": 76.53125,
+            "tick": 53276,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=93% B=4% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 76.53125,
+            "tick": 53276,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "TRADE (Q=+7.78) \u2014 Move to refrag a fallen teammate [late, 3v1, you at B]"
+          },
+          {
+            "time_sec": 76.625,
+            "tick": 53282,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=56% B=8% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          }
+        ],
+        "outcome": "Round won. You had 1K 100DMG."
+      }
+    },
+    {
+      "round": 9,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 0,
+      "economy": {
+        "money": 8550,
+        "action": "FULL_BUY",
+        "optimal": "FULL_BUY",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$3429 (FORCE buy or light rifles, 44% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 3429,
+        "weapon_matchup": "",
+        "team_avg_money": 3800,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $8550).",
+          "[Economy HMM] Enemy ~$3429 (FORCE buy or light rifles, 44% confidence)",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "No kills and no damage dealt. Try to find at least one engagement \u2014 even chip damage helps your team.",
+          "[NN] Round win probability: 0% for your side (T favored) \u2014 play for trades, avoid isolated fights.",
+          "[NN] T-side is 94% likely to hit B vs 6% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 11.40625,
+            "tick": 55740,
+            "source": "LSTM",
+            "trigger": "CT smoke @ MID",
+            "text": "A=36% B=27% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 11.40625,
+            "tick": 55740,
+            "source": "RL",
+            "trigger": "CT smoke @ MID",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 11.5625,
+            "tick": 55750,
+            "source": "LSTM",
+            "trigger": "CT smoke @ B",
+            "text": "A=19% B=17% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 12.453125,
+            "tick": 55807,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "A=44% B=30% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 14.65625,
+            "tick": 55948,
+            "source": "LSTM",
+            "trigger": "CT HE @ MID",
+            "text": "A=38% B=27% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 18.6875,
+            "tick": 56206,
+            "source": "LSTM",
+            "trigger": "CT smoke @ MID",
+            "text": "A=27% B=22% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 18.6875,
+            "tick": 56206,
+            "source": "RL",
+            "trigger": "CT smoke @ MID",
+            "text": "HOLD (Q=+8.23) \u2014 Hold your position and wait for contact [early, 5v4, you at A]"
+          },
+          {
+            "time_sec": 23.859375,
+            "tick": 56537,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=13% B=11% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 23.859375,
+            "tick": 56537,
+            "source": "RL",
+            "trigger": "CT flash @ MID",
+            "text": "FALL_BACK (Q=+7.61) \u2014 Fall back to a safer crossfire angle [early, 5v4, you at MID]"
+          },
+          {
+            "time_sec": 29.765625,
+            "tick": 56915,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=7% B=5% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 29.765625,
+            "tick": 56915,
+            "source": "RL",
+            "trigger": "CT HE @ A",
+            "text": "HOLD (Q=+8.23) \u2014 Hold your position and wait for contact [early, 5v4, you at A]"
+          },
+          {
+            "time_sec": 32.21875,
+            "tick": 57072,
+            "source": "RL",
+            "trigger": "CT smoke @ A",
+            "text": "FALL_BACK (Q=+7.60) \u2014 Fall back to a safer crossfire angle [mid-round, 5v4, you at MID]"
+          },
+          {
+            "time_sec": 32.46875,
+            "tick": 57088,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=18% B=14% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 69.0,
+            "tick": 59426,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (deagle)",
+            "text": "A=32% B=1% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 69.0,
+            "tick": 59426,
+            "source": "EVENT",
+            "trigger": "T kills CT @ A (deagle)",
+            "text": "You died \u2014 round over for you"
+          },
+          {
+            "time_sec": 73.09375,
+            "tick": 59688,
+            "source": "LSTM",
+            "trigger": "CT smoke @ A",
+            "text": "A=3% B=0% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 74.96875,
+            "tick": 59808,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=55% B=3% \u2014 likely default/slow round"
+          },
+          {
+            "time_sec": 75.96875,
+            "tick": 59872,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=2% B=0% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 77.640625,
+            "tick": 59979,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 96.34375,
+            "tick": 61176,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          }
+        ],
+        "outcome": "Round won. No impact this round."
+      }
+    },
+    {
+      "round": 10,
+      "side": "CT",
+      "winner": "CT",
+      "won": true,
+      "kills": 1,
+      "deaths": 1,
+      "damage": 100,
+      "economy": {
+        "money": 9600,
+        "action": "FULL_BUY",
+        "optimal": "FULL_BUY",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$1723 (ECO round, 50% confidence)",
+        "enemy_tier": "BROKE",
+        "enemy_money": 1723,
+        "weapon_matchup": "AWP vs predicted eco \u2014 overkill, could save $4750 for team",
+        "team_avg_money": 5130,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly.",
+          "Good buy decision (FULL_BUY at $9600).",
+          "[Economy HMM] Enemy ~$1723 (ECO round, 50% confidence)",
+          "[Weapon Matchup] AWP vs predicted eco \u2014 overkill, could save $4750 for team",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "[NN] Round win probability: 100% for your side (CT favored) \u2014 you have economy/position advantage, play default and use utility.",
+          "[NN] T-side is 93% likely to hit B vs 7% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 8.28125,
+            "tick": 63820,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=36% B=26% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 8.28125,
+            "tick": 63820,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 9.078125,
+            "tick": 63871,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 9.453125,
+            "tick": 63895,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=22% B=18% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 10.265625,
+            "tick": 63947,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=13% B=11% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 12.25,
+            "tick": 64074,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=4% B=2% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 12.65625,
+            "tick": 64100,
+            "source": "RL",
+            "trigger": "CT kills CT @ MID (world)",
+            "text": "TRADE (Q=+10.49) \u2014 Move to refrag a fallen teammate [early, 4v5, you at MID]"
+          },
+          {
+            "time_sec": 13.75,
+            "tick": 64170,
+            "source": "RL",
+            "trigger": "CT smoke @ A",
+            "text": "PEEK (Q=+8.59) \u2014 Push for info or an aggressive peek [early, 4v5, you at B]"
+          },
+          {
+            "time_sec": 16.0,
+            "tick": 64314,
+            "source": "LSTM",
+            "trigger": "CT kills T @ T_BASE (ak47)",
+            "text": "A=12% B=8% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 18.09375,
+            "tick": 64448,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (ak47)",
+            "text": "A=15% B=16% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 18.09375,
+            "tick": 64448,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (ak47)",
+            "text": "ROTATE (Q=+7.42) \u2014 Rotate toward the active site [early, 4v3, you at B]"
+          },
+          {
+            "time_sec": 18.8125,
+            "tick": 64494,
+            "source": "LSTM",
+            "trigger": "CT smoke @ A",
+            "text": "A=22% B=24% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 23.1875,
+            "tick": 64774,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "A=16% B=17% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 23.1875,
+            "tick": 64774,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "TRADE (Q=+9.23) \u2014 Move to refrag a fallen teammate [early, 4v2, you at B]"
+          },
+          {
+            "time_sec": 24.015625,
+            "tick": 64827,
+            "source": "LSTM",
+            "trigger": "T flash @ B",
+            "text": "A=38% B=25% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 24.015625,
+            "tick": 64827,
+            "source": "RL",
+            "trigger": "T flash @ B",
+            "text": "HOLD (Q=+5.12) \u2014 Hold your position and wait for contact [early, 4v2, you at B]"
+          },
+          {
+            "time_sec": 31.15625,
+            "tick": 65284,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=17% B=8% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 31.15625,
+            "tick": 65284,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "PEEK (Q=+5.89) \u2014 Push for info or an aggressive peek [mid-round, 4v2, you at B]"
+          },
+          {
+            "time_sec": 42.59375,
+            "tick": 66016,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (awp)",
+            "text": "A=58% B=16% \u2014 attack incoming, direction unclear \u2014 stay alert"
+          },
+          {
+            "time_sec": 42.59375,
+            "tick": 66016,
+            "source": "RL",
+            "trigger": "CT kills T @ B (awp)",
+            "text": "FALL_BACK (Q=+6.84) \u2014 Fall back to a safer crossfire angle [mid-round, 4v1, you at B]"
+          },
+          {
+            "time_sec": 47.28125,
+            "tick": 66316,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (deagle)",
+            "text": "A=0% B=100% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 47.28125,
+            "tick": 66316,
+            "source": "EVENT",
+            "trigger": "T kills CT @ B (deagle)",
+            "text": "You died \u2014 round over for you"
+          },
+          {
+            "time_sec": 64.234375,
+            "tick": 67401,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (ak47)",
+            "text": "A=0% B=99% \u2014 B attack likely \u2014 rotate/stack B"
+          }
+        ],
+        "outcome": "Round won. You had 1K 100DMG."
+      }
+    },
+    {
+      "round": 11,
+      "side": "CT",
+      "winner": "T",
+      "won": false,
+      "kills": 1,
+      "deaths": 1,
+      "damage": 65,
+      "economy": {
+        "money": 2550,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$1581 (ECO round, 52% confidence)",
+        "enemy_tier": "BROKE",
+        "enemy_money": 1581,
+        "weapon_matchup": "AWP vs predicted eco \u2014 overkill, could save $4750 for team",
+        "team_avg_money": 5020,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": [
+          "Died without trade",
+          "1v4 clutch attempt"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Pistol round \u2014 aim for headshots, stick together, and trade kills quickly.",
+          "Good buy decision (FULL_BUY at $2550).",
+          "[Economy HMM] Enemy ~$1581 (ECO round, 52% confidence)",
+          "[Weapon Matchup] AWP vs predicted eco \u2014 overkill, could save $4750 for team",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "1v4 clutch attempt \u2014 tough situation. If the round is unwinnable, consider saving your weapon for next round.",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "[NN] Round win probability: 100% for your side (CT favored) \u2014 you have economy/position advantage, play default and use utility.",
+          "[NN] T-side is 90% likely to hit B vs 10% A \u2014 consider anchoring B or having utility ready for B."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.921875,
+            "tick": 69636,
+            "source": "LSTM",
+            "trigger": "CT flash @ T_BASE",
+            "text": "A=31% B=25% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 7.921875,
+            "tick": 69636,
+            "source": "RL",
+            "trigger": "CT flash @ T_BASE",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 13.75,
+            "tick": 70009,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "A=14% B=12% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 13.75,
+            "tick": 70009,
+            "source": "RL",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "ROTATE (Q=+7.42) \u2014 Rotate toward the active site [early, 5v4, you at B]"
+          },
+          {
+            "time_sec": 18.1875,
+            "tick": 70293,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=22% B=20% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 18.1875,
+            "tick": 70293,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "FALL_BACK (Q=+7.61) \u2014 Fall back to a safer crossfire angle [early, 5v4, you at MID]"
+          },
+          {
+            "time_sec": 19.40625,
+            "tick": 70371,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "A=86% B=6% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 19.40625,
+            "tick": 70371,
+            "source": "RL",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "UTILITY (Q=+10.32) \u2014 Use utility (flash/smoke) to control space [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 19.515625,
+            "tick": 70378,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "TRADE (Q=+11.28) \u2014 Move to refrag a fallen teammate [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 19.71875,
+            "tick": 70391,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=98% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 28.59375,
+            "tick": 70959,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=78% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 28.6875,
+            "tick": 70965,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=51% B=1% \u2014 likely default/slow round"
+          },
+          {
+            "time_sec": 29.203125,
+            "tick": 70998,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=23% B=1% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 29.203125,
+            "tick": 70998,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "FALL_BACK (Q=+9.30) \u2014 Fall back to a safer crossfire angle [early, 4v4, you at MID]"
+          },
+          {
+            "time_sec": 31.640625,
+            "tick": 71154,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=44% B=1% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 32.40625,
+            "tick": 71203,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=17% B=2% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 35.921875,
+            "tick": 71428,
+            "source": "RL",
+            "trigger": "T HE @ A",
+            "text": "UTILITY (Q=+9.63) \u2014 Use utility (flash/smoke) to control space [mid-round, 4v4, you at CT_BASE]"
+          },
+          {
+            "time_sec": 36.375,
+            "tick": 71457,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "A=28% B=18% \u2014 no clear attack direction yet"
+          },
+          {
+            "time_sec": 36.375,
+            "tick": 71457,
+            "source": "RL",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "HOLD (Q=+8.81) \u2014 Hold your position and wait for contact [mid-round, 3v4, you at CT_BASE]"
+          },
+          {
+            "time_sec": 42.203125,
+            "tick": 71830,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=21% B=69% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 42.203125,
+            "tick": 71830,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "TRADE (Q=+9.26) \u2014 Move to refrag a fallen teammate [mid-round, 2v4, you at A]"
+          },
+          {
+            "time_sec": 45.515625,
+            "tick": 72042,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=4% B=94% \u2014 B attack likely \u2014 rotate/stack B"
+          },
+          {
+            "time_sec": 45.515625,
+            "tick": 72042,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "PEEK (Q=+5.76) \u2014 Push for info or an aggressive peek [mid-round, 1v4, you at A]"
+          },
+          {
+            "time_sec": 45.609375,
+            "tick": 72048,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 45.609375,
+            "tick": 72048,
+            "source": "RL",
+            "trigger": "Bomb planted A",
+            "text": "HOLD (Q=+8.37) \u2014 Wait for teammates to group for retake [post-plant, 1v4, you at A]"
+          },
+          {
+            "time_sec": 51.421875,
+            "tick": 72420,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (galilar)",
+            "text": "A=100% B=0% \u2014 A attack likely \u2014 rotate/stack A"
+          },
+          {
+            "time_sec": 51.421875,
+            "tick": 72420,
+            "source": "EVENT",
+            "trigger": "T kills CT @ A (galilar)",
+            "text": "You died \u2014 round over for you"
+          }
+        ],
+        "outcome": "Round lost. You had 1K 65DMG."
+      }
+    },
+    {
+      "round": 12,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 0,
+      "deaths": 0,
+      "damage": 106,
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "[NN] Round win probability: 53% for your side \u2014 roughly even, focus on getting the bomb down.",
+          "[NN] CT defense looks weaker on B (24%) \u2014 focus utility and coordination for a B execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 16.125,
+            "tick": 75692,
+            "source": "LSTM",
+            "trigger": "CT HE @ B",
+            "text": "A=22% B=75% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 16.125,
+            "tick": 75692,
+            "source": "RL",
+            "trigger": "CT HE @ B",
+            "text": "TRADE (Q=+9.79) \u2014 Follow up on teammate's contact for a trade [early, 5v5, you at B]"
+          },
+          {
+            "time_sec": 24.9375,
+            "tick": 76256,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "A=5% B=95% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 39.140625,
+            "tick": 77165,
+            "source": "RL",
+            "trigger": "Bomb planted B",
+            "text": "PEEK (Q=+0.00) \u2014 Take an off-angle to catch retaking CTs [post-plant, 3v3, you at MID]"
+          },
+          {
+            "time_sec": 46.90625,
+            "tick": 77662,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (glock)",
+            "text": "HOLD (Q=+9.27) \u2014 Hold your post-plant position [post-plant, 3v2, you at B]"
+          },
+          {
+            "time_sec": 50.609375,
+            "tick": 77899,
+            "source": "RL",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "TRADE (Q=+5.47) \u2014 Push to trade \u2014 time is on your side [post-plant, 3v1, you at MID]"
+          },
+          {
+            "time_sec": 56.28125,
+            "tick": 78262,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (glock)",
+            "text": "A=0% B=100% \u2014 your team is executing B \u2014 commit to the push"
+          }
+        ],
+        "outcome": "Round won. You dealt 106DMG but no kills."
+      }
+    },
+    {
+      "round": 13,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 2,
+      "deaths": 0,
+      "damage": 116,
+      "economy": {
+        "money": 1700,
+        "action": "FORCE",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$1248 (ECO round, 73% confidence)",
+        "enemy_tier": "BROKE",
+        "enemy_money": 1248,
+        "weapon_matchup": "SMG vs eco \u2014 good economy choice, extra kill reward",
+        "team_avg_money": 1200,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 2,
+        "clutch": false,
+        "notes": [
+          "2K round"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FORCE at $1700).",
+          "[Economy HMM] Enemy ~$1248 (ECO round, 73% confidence)",
+          "[Weapon Matchup] SMG vs eco \u2014 good economy choice, extra kill reward",
+          "[Team Econ] Team avg $1200 \u2014 team cannot full buy next round",
+          "Impact round with 2 kills and 116 damage!",
+          "[NN] Round win probability: 48% for your side \u2014 roughly even, focus on getting the bomb down.",
+          "[NN] Attack probability is roughly even (A: 50%, B: 50%) \u2014 stay flexible and read the round before committing to a site.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 5.421875,
+            "tick": 80337,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=41% B=28% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 5.421875,
+            "tick": 80337,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+10.28) \u2014 Take an aggressive entry peek [early, 5v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 6.96875,
+            "tick": 80436,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=28% B=21% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 8.203125,
+            "tick": 80515,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=1% B=1% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 15.859375,
+            "tick": 81005,
+            "source": "RL",
+            "trigger": "CT flash @ A",
+            "text": "TRADE (Q=+12.61) \u2014 Follow up on teammate's contact for a trade [early, 5v5, you at A]"
+          },
+          {
+            "time_sec": 17.1875,
+            "tick": 81090,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "UTILITY (Q=+11.59) \u2014 Use utility before committing to a site [early, 4v5, you at A]"
+          },
+          {
+            "time_sec": 17.703125,
+            "tick": 81123,
+            "source": "RL",
+            "trigger": "T kills CT @ A (mac10)",
+            "text": "HOLD (Q=+11.84) \u2014 Play default and wait for a pick [early, 4v4, you at A]"
+          },
+          {
+            "time_sec": 24.03125,
+            "tick": 81528,
+            "source": "RL",
+            "trigger": "CT kills T @ A (usp_silencer)",
+            "text": "TRADE (Q=+11.56) \u2014 Follow up on teammate's contact for a trade [early, 3v4, you at A]"
+          },
+          {
+            "time_sec": 28.625,
+            "tick": 81822,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 your team is executing A \u2014 commit to the push"
+          },
+          {
+            "time_sec": 28.625,
+            "tick": 81822,
+            "source": "RL",
+            "trigger": "Bomb planted A",
+            "text": "HOLD (Q=+13.02) \u2014 Hold your post-plant position [post-plant, 3v4, you at A]"
+          },
+          {
+            "time_sec": 32.28125,
+            "tick": 82056,
+            "source": "RL",
+            "trigger": "T kills CT @ MID (mac10)",
+            "text": "TRADE (Q=+15.08) \u2014 Push to trade \u2014 time is on your side [post-plant, 3v2, you at A]"
+          },
+          {
+            "time_sec": 44.53125,
+            "tick": 82840,
+            "source": "LSTM",
+            "trigger": "T kills CT @ CT_BASE (mac10)",
+            "text": "A=100% B=0% \u2014 your team is executing A \u2014 commit to the push"
+          }
+        ],
+        "outcome": "Round won. You had 2K 116DMG."
+      }
+    },
+    {
+      "round": 14,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 2,
+      "deaths": 1,
+      "damage": 200,
+      "economy": {
+        "money": 2150,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$2418 (FORCE buy or upgraded pistols, 76% confidence)",
+        "enemy_tier": "LOW",
+        "enemy_money": 2418,
+        "weapon_matchup": "Rifle vs eco \u2014 solid, but SMG would earn more kill reward",
+        "team_avg_money": 2870,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": true,
+        "opening_death": false,
+        "isolated_death": true,
+        "multi_kill": 2,
+        "clutch": false,
+        "notes": [
+          "Won opening duel",
+          "2K round",
+          "Died without trade"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $2150).",
+          "[Economy HMM] Enemy ~$2418 (FORCE buy or upgraded pistols, 76% confidence)",
+          "[Weapon Matchup] Rifle vs eco \u2014 solid, but SMG would earn more kill reward",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "Great opening frag \u2014 first blood gives your team a huge advantage.",
+          "Impact round with 2 kills and 200 damage!",
+          "Died with no teammate close enough to trade. Hold positions where a teammate can refrag within 5 seconds.",
+          "[NN] Round win probability: 64% for your side (T favored) \u2014 you have the economy advantage, execute confidently with full utility.",
+          "[NN] CT defense looks weaker on A (15%) \u2014 focus utility and coordination for a A execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 7.515625,
+            "tick": 85049,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=25% B=22% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 7.515625,
+            "tick": 85049,
+            "source": "RL",
+            "trigger": "CT flash @ A",
+            "text": "PEEK (Q=+9.71) \u2014 Take an aggressive entry peek [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 9.03125,
+            "tick": 85146,
+            "source": "LSTM",
+            "trigger": "T smoke @ MID",
+            "text": "A=19% B=18% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 9.03125,
+            "tick": 85146,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "TRADE (Q=+9.79) \u2014 Follow up on teammate's contact for a trade [early, 5v5, you at B]"
+          },
+          {
+            "time_sec": 10.734375,
+            "tick": 85255,
+            "source": "LSTM",
+            "trigger": "CT flash @ B",
+            "text": "A=12% B=10% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 12.203125,
+            "tick": 85349,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=7% B=4% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 12.203125,
+            "tick": 85349,
+            "source": "RL",
+            "trigger": "CT HE @ A",
+            "text": "PEEK (Q=+9.71) \u2014 Take an aggressive entry peek [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 25.953125,
+            "tick": 86229,
+            "source": "LSTM",
+            "trigger": "T smoke @ B",
+            "text": "A=11% B=37% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 25.953125,
+            "tick": 86229,
+            "source": "RL",
+            "trigger": "T smoke @ B",
+            "text": "TRADE (Q=+9.82) \u2014 Follow up on teammate's contact for a trade [early, 5v4, you at B]"
+          },
+          {
+            "time_sec": 27.453125,
+            "tick": 86325,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (m4a1)",
+            "text": "A=3% B=97% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 27.453125,
+            "tick": 86325,
+            "source": "RL",
+            "trigger": "CT kills T @ B (m4a1)",
+            "text": "HOLD (Q=+10.11) \u2014 Play default and wait for a pick [early, 4v4, you at B]"
+          },
+          {
+            "time_sec": 27.953125,
+            "tick": 86357,
+            "source": "RL",
+            "trigger": "T kills CT @ B (mac10)",
+            "text": "TRADE (Q=+10.50) \u2014 Follow up on teammate's contact for a trade [early, 4v3, you at B]"
+          },
+          {
+            "time_sec": 33.71875,
+            "tick": 86726,
+            "source": "RL",
+            "trigger": "Bomb planted B",
+            "text": "FALL_BACK (Q=+9.09) \u2014 Play safe in cover, let the timer work [post-plant, 4v3, you at B]"
+          },
+          {
+            "time_sec": 34.640625,
+            "tick": 86785,
+            "source": "RL",
+            "trigger": "T smoke @ B",
+            "text": "HOLD (Q=+8.61) \u2014 Hold your post-plant position [post-plant, 4v3, you at B]"
+          },
+          {
+            "time_sec": 34.75,
+            "tick": 86792,
+            "source": "RL",
+            "trigger": "T kills CT @ A (galilar)",
+            "text": "TRADE (Q=+8.20) \u2014 Push to trade \u2014 time is on your side [post-plant, 4v2, you at B]"
+          },
+          {
+            "time_sec": 35.09375,
+            "tick": 86814,
+            "source": "RL",
+            "trigger": "CT kills T @ MID (m4a1_silencer)",
+            "text": "HOLD (Q=+8.44) \u2014 Hold your post-plant position [post-plant, 3v2, you at B]"
+          },
+          {
+            "time_sec": 35.90625,
+            "tick": 86866,
+            "source": "RL",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "TRADE (Q=+8.20) \u2014 Push to trade \u2014 time is on your side [post-plant, 3v1, you at B]"
+          },
+          {
+            "time_sec": 48.0,
+            "tick": 87640,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "HOLD (Q=+7.58) \u2014 Hold your post-plant position [post-plant, 3v1, you at B]"
+          },
+          {
+            "time_sec": 69.671875,
+            "tick": 89027,
+            "source": "LSTM",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "A=0% B=100% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 69.671875,
+            "tick": 89027,
+            "source": "EVENT",
+            "trigger": "CT kills T @ B (m4a1_silencer)",
+            "text": "You died \u2014 round over for you"
+          }
+        ],
+        "outcome": "Round won. You had 2K 200DMG."
+      }
+    },
+    {
+      "round": 15,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 2,
+      "deaths": 0,
+      "damage": 167,
+      "economy": {
+        "money": 1550,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$4230 (FORCE buy or light rifles, 49% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 4230,
+        "weapon_matchup": "",
+        "team_avg_money": 3760,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 2,
+        "clutch": false,
+        "notes": [
+          "2K round"
+        ]
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $1550).",
+          "[Economy HMM] Enemy ~$4230 (FORCE buy or light rifles, 49% confidence)",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "Impact round with 2 kills and 167 damage!",
+          "[NN] Round win probability: 76% for your side (T favored) \u2014 you have the economy advantage, execute confidently with full utility.",
+          "[NN] CT defense looks weaker on A (10%) \u2014 focus utility and coordination for a A execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 6.625,
+            "tick": 91502,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=41% B=28% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 6.625,
+            "tick": 91502,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+10.28) \u2014 Take an aggressive entry peek [early, 5v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 7.953125,
+            "tick": 91587,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=22% B=20% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 9.4375,
+            "tick": 91682,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=1% B=1% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 9.4375,
+            "tick": 91682,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "UTILITY (Q=+9.60) \u2014 Use utility before committing to a site [early, 4v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 9.859375,
+            "tick": 91709,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+8.67) \u2014 Take an aggressive entry peek [early, 4v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 10.46875,
+            "tick": 91748,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "UTILITY (Q=+10.12) \u2014 Use utility before committing to a site [early, 4v4, you at T_BASE]"
+          },
+          {
+            "time_sec": 12.09375,
+            "tick": 91852,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+9.71) \u2014 Take an aggressive entry peek [early, 4v4, you at MID]"
+          },
+          {
+            "time_sec": 18.140625,
+            "tick": 92239,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=13% B=0% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 19.234375,
+            "tick": 92309,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=90% B=2% \u2014 your team is executing A \u2014 commit to the push"
+          },
+          {
+            "time_sec": 22.84375,
+            "tick": 92540,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (mp9)",
+            "text": "A=23% B=1% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 24.625,
+            "tick": 92654,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "TRADE (Q=+12.75) \u2014 Follow up on teammate's contact for a trade [early, 3v2, you at A]"
+          },
+          {
+            "time_sec": 25.25,
+            "tick": 92694,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 your team is executing A \u2014 commit to the push"
+          },
+          {
+            "time_sec": 35.0625,
+            "tick": 93322,
+            "source": "RL",
+            "trigger": "CT flash @ A",
+            "text": "PEEK (Q=+11.49) \u2014 Take an off-angle to catch retaking CTs [post-plant, 3v2, you at MID]"
+          },
+          {
+            "time_sec": 37.625,
+            "tick": 93486,
+            "source": "RL",
+            "trigger": "CT kills T @ A (ssg08)",
+            "text": "HOLD (Q=+13.79) \u2014 Hold your post-plant position [post-plant, 2v2, you at A]"
+          },
+          {
+            "time_sec": 41.0,
+            "tick": 93702,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "TRADE (Q=+15.08) \u2014 Push to trade \u2014 time is on your side [post-plant, 2v1, you at A]"
+          },
+          {
+            "time_sec": 46.734375,
+            "tick": 94069,
+            "source": "RL",
+            "trigger": "T HE @ A",
+            "text": "PEEK (Q=+11.49) \u2014 Take an off-angle to catch retaking CTs [post-plant, 2v1, you at MID]"
+          },
+          {
+            "time_sec": 50.109375,
+            "tick": 94285,
+            "source": "RL",
+            "trigger": "CT smoke @ A",
+            "text": "TRADE (Q=+12.62) \u2014 Push to trade \u2014 time is on your side [post-plant, 2v1, you at A]"
+          },
+          {
+            "time_sec": 53.34375,
+            "tick": 94492,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=100% B=0% \u2014 your team is executing A \u2014 commit to the push"
+          }
+        ],
+        "outcome": "Round won. You had 2K 167DMG."
+      }
+    },
+    {
+      "round": 16,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 100,
+      "economy": {
+        "money": 3550,
+        "action": "FULL_BUY",
+        "optimal": "SAVE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$3465 (FORCE buy or light rifles, 45% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 3465,
+        "weapon_matchup": "",
+        "team_avg_money": 3960,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $3550).",
+          "[Economy HMM] Enemy ~$3465 (FORCE buy or light rifles, 45% confidence)",
+          "[NN] Round win probability: 80% for your side (T favored) \u2014 you have the economy advantage, execute confidently with full utility.",
+          "[NN] CT defense looks weaker on A (8%) \u2014 focus utility and coordination for a A execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 9.609375,
+            "tick": 96835,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=30% B=24% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 9.609375,
+            "tick": 96835,
+            "source": "RL",
+            "trigger": "T flash @ MID",
+            "text": "PEEK (Q=+9.71) \u2014 Take an aggressive entry peek [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 10.0625,
+            "tick": 96864,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=23% B=19% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 12.765625,
+            "tick": 97037,
+            "source": "LSTM",
+            "trigger": "CT flash @ B",
+            "text": "A=8% B=6% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 15.9375,
+            "tick": 97240,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (m4a1)",
+            "text": "A=0% B=0% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 19.796875,
+            "tick": 97487,
+            "source": "RL",
+            "trigger": "CT smoke @ MID",
+            "text": "UTILITY (Q=+9.53) \u2014 Use utility before committing to a site [early, 4v2, you at MID]"
+          },
+          {
+            "time_sec": 30.625,
+            "tick": 98180,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "PEEK (Q=+10.56) \u2014 Take an aggressive entry peek [mid-round, 4v2, you at MID]"
+          },
+          {
+            "time_sec": 31.203125,
+            "tick": 98217,
+            "source": "RL",
+            "trigger": "T smoke @ MID",
+            "text": "UTILITY (Q=+8.51) \u2014 Use utility before committing to a site [mid-round, 4v2, you at T_BASE]"
+          },
+          {
+            "time_sec": 49.015625,
+            "tick": 99357,
+            "source": "LSTM",
+            "trigger": "Bomb planted A",
+            "text": "A=100% B=0% \u2014 your team is executing A \u2014 commit to the push"
+          },
+          {
+            "time_sec": 49.015625,
+            "tick": 99357,
+            "source": "RL",
+            "trigger": "Bomb planted A",
+            "text": "HOLD (Q=+10.71) \u2014 Hold your post-plant position [post-plant, 4v2, you at A]"
+          },
+          {
+            "time_sec": 55.203125,
+            "tick": 99753,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "UTILITY (Q=+11.98) \u2014 Delay the retake with utility [post-plant, 4v1, you at A]"
+          },
+          {
+            "time_sec": 57.203125,
+            "tick": 99881,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=100% B=0% \u2014 your team is executing A \u2014 commit to the push"
+          }
+        ],
+        "outcome": "Round won. You had 1K 100DMG."
+      }
+    },
+    {
+      "round": 17,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 17,
+      "economy": {
+        "money": 6900,
+        "action": "FULL_BUY",
+        "optimal": "FULL_BUY",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$3437 (FORCE buy or light rifles, 45% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 3437,
+        "weapon_matchup": "",
+        "team_avg_money": 6050,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $6900).",
+          "[Economy HMM] Enemy ~$3437 (FORCE buy or light rifles, 45% confidence)",
+          "[NN] Round win probability: 4% for your side (CT favored) \u2014 consider a default to look for picks before committing to a site.",
+          "[NN] CT defense looks weaker on A (7%) \u2014 focus utility and coordination for a A execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 6.40625,
+            "tick": 102019,
+            "source": "LSTM",
+            "trigger": "CT smoke @ A",
+            "text": "A=33% B=26% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 6.40625,
+            "tick": 102019,
+            "source": "RL",
+            "trigger": "CT smoke @ A",
+            "text": "PEEK (Q=+9.71) \u2014 Take an aggressive entry peek [early, 5v5, you at MID]"
+          },
+          {
+            "time_sec": 6.96875,
+            "tick": 102055,
+            "source": "LSTM",
+            "trigger": "CT flash @ MID",
+            "text": "A=20% B=19% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 7.75,
+            "tick": 102105,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=13% B=11% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 11.703125,
+            "tick": 102358,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=23% B=19% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 13.875,
+            "tick": 102497,
+            "source": "LSTM",
+            "trigger": "T flash @ B",
+            "text": "A=10% B=78% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 17.515625,
+            "tick": 102730,
+            "source": "LSTM",
+            "trigger": "T smoke @ B",
+            "text": "A=6% B=94% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 23.96875,
+            "tick": 103143,
+            "source": "LSTM",
+            "trigger": "T HE @ MID",
+            "text": "A=30% B=50% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 24.828125,
+            "tick": 103198,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=8% B=92% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 37.859375,
+            "tick": 104032,
+            "source": "RL",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "ROTATE (Q=+11.21) \u2014 Shift to the other site [mid-round, 5v2, you at A]"
+          },
+          {
+            "time_sec": 38.359375,
+            "tick": 104064,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "UTILITY (Q=+8.10) \u2014 Use utility before committing to a site [mid-round, 5v2, you at A]"
+          },
+          {
+            "time_sec": 42.453125,
+            "tick": 104326,
+            "source": "RL",
+            "trigger": "CT kills T @ A (xm1014)",
+            "text": "HOLD (Q=+11.28) \u2014 Play default and wait for a pick [mid-round, 4v2, you at A]"
+          },
+          {
+            "time_sec": 56.859375,
+            "tick": 105248,
+            "source": "RL",
+            "trigger": "CT kills T @ A (famas)",
+            "text": "TRADE (Q=+14.46) \u2014 Push to trade \u2014 time is on your side [post-plant, 3v2, you at A]"
+          },
+          {
+            "time_sec": 60.828125,
+            "tick": 105502,
+            "source": "LSTM",
+            "trigger": "T kills CT @ MID (ak47)",
+            "text": "A=2% B=94% \u2014 your team is executing B \u2014 commit to the push"
+          }
+        ],
+        "outcome": "Round won. You had 1K 17DMG."
+      }
+    },
+    {
+      "round": 18,
+      "side": "T",
+      "winner": "CT",
+      "won": false,
+      "kills": 0,
+      "deaths": 1,
+      "damage": 35,
+      "economy": {
+        "money": 9200,
+        "action": "FULL_BUY",
+        "optimal": "FULL_BUY",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$3439 (FORCE buy or light rifles, 45% confidence)",
+        "enemy_tier": "MEDIUM",
+        "enemy_money": 3439,
+        "weapon_matchup": "",
+        "team_avg_money": 6880,
+        "is_drop": false
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $9200).",
+          "[Economy HMM] Enemy ~$3439 (FORCE buy or light rifles, 45% confidence)",
+          "You died but a teammate traded the kill \u2014 acceptable if you gained info or map control.",
+          "Only 35 damage this round. Look for opportunities to deal more damage through utility or repositioning.",
+          "[NN] Round win probability: 6% for your side (CT favored) \u2014 consider a default to look for picks before committing to a site.",
+          "[NN] CT defense looks weaker on A (7%) \u2014 focus utility and coordination for a A execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 5.09375,
+            "tick": 107556,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=41% B=28% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 5.09375,
+            "tick": 107556,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+10.28) \u2014 Take an aggressive entry peek [early, 5v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 6.640625,
+            "tick": 107655,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=28% B=21% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 6.8125,
+            "tick": 107666,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=1% B=1% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 8.65625,
+            "tick": 107784,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "UTILITY (Q=+9.60) \u2014 Use utility before committing to a site [early, 4v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 10.3125,
+            "tick": 107890,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+9.48) \u2014 Take an aggressive entry peek [early, 4v5, you at MID]"
+          },
+          {
+            "time_sec": 15.015625,
+            "tick": 108191,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "UTILITY (Q=+10.12) \u2014 Use utility before committing to a site [early, 4v4, you at T_BASE]"
+          },
+          {
+            "time_sec": 16.171875,
+            "tick": 108265,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=39% B=0% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 16.171875,
+            "tick": 108265,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "PEEK (Q=+10.28) \u2014 Take an aggressive entry peek [early, 4v4, you at T_BASE]"
+          },
+          {
+            "time_sec": 16.359375,
+            "tick": 108277,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=1% B=0% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 16.359375,
+            "tick": 108277,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "UTILITY (Q=+9.60) \u2014 Use utility before committing to a site [early, 3v4, you at T_BASE]"
+          },
+          {
+            "time_sec": 16.40625,
+            "tick": 108280,
+            "source": "RL",
+            "trigger": "CT flash @ MID",
+            "text": "PEEK (Q=+8.67) \u2014 Take an aggressive entry peek [early, 3v4, you at T_BASE]"
+          },
+          {
+            "time_sec": 18.15625,
+            "tick": 108392,
+            "source": "RL",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "HOLD (Q=+11.84) \u2014 Play default and wait for a pick [early, 3v3, you at A]"
+          },
+          {
+            "time_sec": 18.40625,
+            "tick": 108408,
+            "source": "RL",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "TRADE (Q=+11.56) \u2014 Follow up on teammate's contact for a trade [early, 2v3, you at A]"
+          },
+          {
+            "time_sec": 18.703125,
+            "tick": 108427,
+            "source": "LSTM",
+            "trigger": "T smoke @ A",
+            "text": "A=38% B=1% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 18.703125,
+            "tick": 108427,
+            "source": "RL",
+            "trigger": "T smoke @ A",
+            "text": "UTILITY (Q=+11.59) \u2014 Use utility before committing to a site [early, 2v3, you at A]"
+          },
+          {
+            "time_sec": 30.265625,
+            "tick": 109167,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "A=26% B=2% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 30.265625,
+            "tick": 109167,
+            "source": "EVENT",
+            "trigger": "CT kills T @ A (m4a1_silencer)",
+            "text": "You died \u2014 round over for you"
+          },
+          {
+            "time_sec": 31.21875,
+            "tick": 109228,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=57% B=5% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 41.1875,
+            "tick": 109866,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=72% B=6% \u2014 your team is executing A \u2014 commit to the push"
+          },
+          {
+            "time_sec": 44.53125,
+            "tick": 110080,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=83% B=10% \u2014 your team is executing A \u2014 commit to the push"
+          },
+          {
+            "time_sec": 60.828125,
+            "tick": 111123,
+            "source": "LSTM",
+            "trigger": "CT kills T @ MID (famas)",
+            "text": "A=43% B=11% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          }
+        ],
+        "outcome": "Round lost. You dealt 35DMG but no kills."
+      }
+    },
+    {
+      "round": 19,
+      "side": "T",
+      "winner": "T",
+      "won": true,
+      "kills": 1,
+      "deaths": 0,
+      "damage": 40,
+      "economy": {
+        "money": 3000,
+        "action": "FULL_BUY",
+        "optimal": "FORCE",
+        "is_optimal": true,
+        "enemy_prediction": "Enemy ~$6062 (FULL BUY with rifles, 47% confidence)",
+        "enemy_tier": "HIGH",
+        "enemy_money": 6062,
+        "weapon_matchup": "",
+        "team_avg_money": 3780,
+        "is_drop": true
+      },
+      "engagement": {
+        "opening_kill": false,
+        "opening_death": false,
+        "isolated_death": false,
+        "multi_kill": 0,
+        "clutch": false,
+        "notes": []
+      },
+      "suggestions": {
+        "pre_round": [
+          "Good buy decision (FULL_BUY at $3000).",
+          "[Economy HMM] Enemy ~$6062 (FULL BUY with rifles, 47% confidence)",
+          "Picked up/received weapon \u2014 good economy play, saved money",
+          "[NN] Round win probability: 78% for your side (T favored) \u2014 you have the economy advantage, execute confidently with full utility.",
+          "[NN] CT defense looks weaker on A (7%) \u2014 focus utility and coordination for a A execute.",
+          "[NN] CT formation unclear \u2014 play default and read their setup from utility/positions."
+        ],
+        "timeline": [
+          {
+            "time_sec": 6.03125,
+            "tick": 113237,
+            "source": "LSTM",
+            "trigger": "T flash @ A",
+            "text": "A=41% B=28% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 6.03125,
+            "tick": 113237,
+            "source": "RL",
+            "trigger": "T flash @ A",
+            "text": "PEEK (Q=+10.28) \u2014 Take an aggressive entry peek [early, 5v5, you at T_BASE]"
+          },
+          {
+            "time_sec": 7.765625,
+            "tick": 113348,
+            "source": "LSTM",
+            "trigger": "CT HE @ A",
+            "text": "A=35% B=24% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 10.703125,
+            "tick": 113536,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=11% B=8% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 11.5,
+            "tick": 113587,
+            "source": "LSTM",
+            "trigger": "T flash @ MID",
+            "text": "A=2% B=1% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 13.875,
+            "tick": 113739,
+            "source": "LSTM",
+            "trigger": "T kills CT @ A (ak47)",
+            "text": "A=11% B=8% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 14.0625,
+            "tick": 113751,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=0% B=0% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 26.140625,
+            "tick": 114524,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "A=22% B=7% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 28.125,
+            "tick": 114651,
+            "source": "LSTM",
+            "trigger": "CT flash @ A",
+            "text": "A=0% B=0% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 28.125,
+            "tick": 114651,
+            "source": "RL",
+            "trigger": "CT flash @ A",
+            "text": "UTILITY (Q=+9.53) \u2014 Use utility before committing to a site [early, 4v2, you at MID]"
+          },
+          {
+            "time_sec": 31.53125,
+            "tick": 114869,
+            "source": "LSTM",
+            "trigger": "T flash @ B",
+            "text": "A=22% B=40% \u2014 execute developing \u2014 stay with your team and read the call"
+          },
+          {
+            "time_sec": 31.53125,
+            "tick": 114869,
+            "source": "RL",
+            "trigger": "T flash @ B",
+            "text": "PEEK (Q=+10.56) \u2014 Take an aggressive entry peek [mid-round, 4v2, you at MID]"
+          },
+          {
+            "time_sec": 34.890625,
+            "tick": 115084,
+            "source": "LSTM",
+            "trigger": "CT kills T @ A (ak47)",
+            "text": "A=6% B=5% \u2014 no clear execute yet \u2014 play default and wait for a call"
+          },
+          {
+            "time_sec": 35.4375,
+            "tick": 115119,
+            "source": "LSTM",
+            "trigger": "T smoke @ B",
+            "text": "A=4% B=88% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 35.4375,
+            "tick": 115119,
+            "source": "RL",
+            "trigger": "T smoke @ B",
+            "text": "HOLD (Q=+8.59) \u2014 Play default and wait for a pick [mid-round, 3v2, you at B]"
+          },
+          {
+            "time_sec": 42.828125,
+            "tick": 115592,
+            "source": "LSTM",
+            "trigger": "Bomb planted B",
+            "text": "A=0% B=100% \u2014 your team is executing B \u2014 commit to the push"
+          },
+          {
+            "time_sec": 42.828125,
+            "tick": 115592,
+            "source": "RL",
+            "trigger": "Bomb planted B",
+            "text": "FALL_BACK (Q=+9.09) \u2014 Play safe in cover, let the timer work [post-plant, 3v2, you at B]"
+          },
+          {
+            "time_sec": 45.921875,
+            "tick": 115790,
+            "source": "RL",
+            "trigger": "T smoke @ B",
+            "text": "HOLD (Q=+8.61) \u2014 Hold your post-plant position [post-plant, 3v2, you at B]"
+          },
+          {
+            "time_sec": 57.078125,
+            "tick": 116504,
+            "source": "LSTM",
+            "trigger": "T kills CT @ B (ak47)",
+            "text": "A=0% B=100% \u2014 your team is executing B \u2014 commit to the push"
+          }
+        ],
+        "outcome": "Round won. You had 1K 40DMG."
+      }
+    }
+  ]
+}
