@@ -1,45 +1,59 @@
 
-# Simplified POMDP / Belief-State Model (v0)
+# Simplified POMDP / Belief-State Model (v1 - Event/State Based)
 
 ## Why POMDP-style Modeling?
-In CS2, the true enemy positions are not fully observable. We only have partial observations (visual cues, teammate events, timing).  
-We therefore maintain a **belief state** over likely enemy presence in coarse map regions, and update it as new observations arrive.
+In CS2, we do not observe the full game state (enemy intentions, rotations, exact positions).
+However, we can observe **events and HUD signals** (time, alive counts, economy, hp/armor, weapon).
+We maintain a **belief** about "how risky the situation is" and output a recommendation label.
+
+This v1 model focuses on macro coaching decisions (SAVE/BUY) because they are more reliably
+inferred from demo/HUD signals than fine-grained spatial positioning.
 
 ## Hidden State (Simplified)
-We model enemy presence at a coarse level:
+We use a coarse hidden state representing the situation difficulty/risk:
 
-- EnemyRegion ∈ {"A", "B", "MID", "UNKNOWN"}
+- DangerLevel ∈ {LOW, MEDIUM, HIGH}
 
-## Observations
-We use partial observations such as:
-- time remaining in round (`time_left`)
-- teammate death site (`teammate_death_site`)
-- VPR output as a distribution over map regions (`place_probs`)
-- (optional) utility cues like smoke, and any "seen enemy" signals
+Interpretation:
+- LOW: favorable/low-risk situation
+- MEDIUM: uncertain/mixed
+- HIGH: high-risk (outnumbered, low economy, low time, etc.)
+
+## Observations (Event/State Signals)
+From demo/HUD we can observe:
+- `time_left`
+- `team_alive`, `enemy_alive`
+- `money`
+- `hp`, `armor`
+- `has_rifle` / weapon indicators
+
+Optional weak signals:
+- `place_probs` / `place_id` (VPR), if available
 
 ## Belief State
-A probability distribution over regions:
-- belief = P(EnemyRegion)
+A probability distribution over DangerLevel:
+- belief = P(DangerLevel)
 
-We initialize or partially set belief using VPR output (`place_probs`) as a prior, then update it with simple rules.
+We update the belief using simple rules (v1 baseline). Later, weights can be learned.
 
-## Belief Update (Rule-Based v0)
-Example intuition:
-- If teammate dies at B, increase belief(B)
-- If time_left is low, rotating is more urgent
-- If smoke blocks a site, reduce confidence of direct information and rely more on belief
-- If "seen enemy at A", increase belief(A) strongly
-
-This is a first prototype update rule (not a full optimal POMDP solver).
+## Belief Update (Rule-Based v1)
+Examples:
+- If `team_alive` is much lower than `enemy_alive`, increase HIGH risk
+- If `money` is very low, increase HIGH risk
+- If `time_left` is low and we are outnumbered, increase HIGH risk
+- If `hp/armor` are low, increase risk
 
 ## Actions / Outputs
-We output a label from:
-- ROTATE_A, ROTATE_B, HOLD, REPOSITION, PLAY_SAFE
+We output a label:
+- SAVE, BUY, FORCE_BUY, PLAY_SAFE
 
-The label is chosen based on the updated belief and simple decision logic.
+Mapping idea:
+- HIGH risk + low money + has_rifle → SAVE
+- good money + stable situation → BUY
+- medium money + needs impact → FORCE_BUY
+- uncertain situation → PLAY_SAFE
 
 ## Extension (Later)
-If time allows, we may:
-- use a finer region grid
-- learn update weights from data
-- evaluate policies under simulated scenarios
+- Replace rule-based mapping with learned policy (MDP/RL)
+- Add more labels and context (bomb planted, site, utility, etc.)
+- Use demo parsing to build training dataset and evaluate decisions quantitatively
