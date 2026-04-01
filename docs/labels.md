@@ -1,12 +1,19 @@
-# Output Labels (v0)
+# Output Labels (v1 - Event/State Based)
 
-We will start with a small label set for the first prototype:
+We focus on macro-level coaching decisions (economy + situation).
 
-- ROTATE_A
-- ROTATE_B
-- HOLD
-- REPOSITION
+## Core Labels (MVP)
+- SAVE
+- BUY
+- FORCE_BUY
 - PLAY_SAFE
 
+## Optional Labels (Later)
+- ROTATE
+- HOLD
+- REPOSITION
+
 Notes:
-- We may later expand this label set based on scope and evaluation.
+- For the first prototype, we prioritize economy-related advice (SAVE/BUY/FORCE_BUY),
+  because these can be inferred from demo/HUD signals more reliably than fine-grained
+  spatial decisions.
