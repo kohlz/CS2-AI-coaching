@@ -1,91 +1,139 @@
 from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Dict, Tuple
-from typing import Dict, Optional
+from typing import Dict, Tuple, Optional
 
 
+# Optional VPR regions (weak signal)
 REGIONS = ["A", "B", "MID"]
-LABELS = ["ROTATE_A", "ROTATE_B", "HOLD", "REPOSITION", "PLAY_SAFE"]
+
+# Output labels (v1: macro decisions)
+LABELS = ["SAVE", "BUY", "FORCE_BUY", "PLAY_SAFE", "ROTATE", "HOLD", "REPOSITION"]
+
 
 @dataclass
 class Observation:
+    # Core event/state fields (MVP)
     time_left: int
-    teammate_death_site: str  # "A", "B", "NONE"
-    place_probs: Optional[Dict[str, float]] = None  # can be None
-    place_id: Optional[str] = None  # "A", "B", "MID" (top-1)
-    smoke_A: bool = False
-    smoke_B: bool = False
-    saw_enemy_A: bool = False
-    saw_enemy_B: bool = False
+    team_alive: int
+    enemy_alive: int
+    hp: int
+    armor: int
+    money: int
+    has_rifle: bool
+
+    # Optional VPR fields (weak signal)
+    place_probs: Optional[Dict[str, float]] = None
+    place_id: Optional[str] = None
+
+    # Optional extra fields (future)
+    bomb_planted: bool = False
 
 
 def normalize(dist: Dict[str, float]) -> Dict[str, float]:
     s = sum(max(v, 0.0) for v in dist.values())
     if s <= 1e-9:
-        # fallback to uniform
         return {k: 1.0 / len(dist) for k in dist}
     return {k: max(v, 0.0) / s for k, v in dist.items()}
 
 
-def make_prior(obs: Observation) -> Dict[str, float]:
-    # prefer place_probs
+def make_vpr_prior(obs: Observation) -> Optional[Dict[str, float]]:
+    """
+    Optional weak prior from VPR. If VPR is missing or unreliable, return None.
+    """
     if obs.place_probs is not None:
-        return dict(obs.place_probs)
+        prior = dict(obs.place_probs)
+        # confidence check: if too flat, treat as unreliable
+        top_prob = max(prior.values()) if prior else 0.0
+        if top_prob < 0.45:
+            return None
+        return normalize(prior)
 
-    # fallback: one-hot from place_id
     if obs.place_id in REGIONS:
         return {r: (1.0 if r == obs.place_id else 0.0) for r in REGIONS}
 
-    # fallback: uniform
-    return {r: 1.0 / len(REGIONS) for r in REGIONS}
-    
+    return None
+
+
 def belief_update(obs: Observation) -> Dict[str, float]:
     """
-    Rule-based belief update (v0).
-    Uses VPR place_probs as a prior, then adjusts using teammate death + simple cues.
+    Belief over a simplified hidden state: DangerLevel ∈ {LOW, MEDIUM, HIGH}.
+    Event/state driven baseline (v1).
     """
-    belief = make_prior(obs)
+    # Start from neutral
+    belief = {"LOW": 1.0, "MEDIUM": 1.0, "HIGH": 1.0}
 
-    # Strong evidence: saw enemy
-    if obs.saw_enemy_A:
-        belief["A"] += 1.5
-    if obs.saw_enemy_B:
-        belief["B"] += 1.5
+    # 1) Alive count disadvantage
+    diff = obs.enemy_alive - obs.team_alive
+    if diff >= 3:
+        belief["HIGH"] += 2.0
+        belief["LOW"] -= 0.5
+    elif diff == 2:
+        belief["HIGH"] += 1.2
+    elif diff == 1:
+        belief["HIGH"] += 0.6
+    elif diff <= -2:
+        # we have advantage
+        belief["LOW"] += 1.2
+        belief["HIGH"] -= 0.3
 
-    # Evidence: teammate death site
-    if obs.teammate_death_site == "A":
-        belief["A"] += 1.0
-    elif obs.teammate_death_site == "B":
-        belief["B"] += 1.0
+    # 2) Money / economy pressure
+    if obs.money < 1000:
+        belief["HIGH"] += 1.5
+    elif obs.money < 2000:
+        belief["HIGH"] += 0.8
+    elif obs.money >= 4000:
+        belief["LOW"] += 0.6
 
-    # Utility cue (very simple): smoke at a site reduces certainty of direct info
-    # Here we just slightly smooth belief when smoke exists.
-    if obs.smoke_A or obs.smoke_B:
-        belief["MID"] += 0.1
+    # 3) Survivability
+    if obs.hp < 40:
+        belief["HIGH"] += 0.7
+    if obs.armor < 40:
+        belief["HIGH"] += 0.4
 
+    # 4) Time pressure (simple)
+    if obs.time_left <= 20 and diff >= 1:
+        belief["HIGH"] += 0.6
+
+    # 5) Optional VPR (weak signal) - doesn't dominate
+    vpr = make_vpr_prior(obs)
+    if vpr is not None:
+        # If VPR says we're likely MID, treat as slightly uncertain
+        if vpr.get("MID", 0.0) >= 0.6:
+            belief["MEDIUM"] += 0.2
+
+    # Ensure non-negative and normalize
+    belief = {k: max(0.0, v) for k, v in belief.items()}
     return normalize(belief)
 
 
 def choose_label(belief: Dict[str, float], obs: Observation) -> str:
     """
-    Convert belief + context into a recommendation label (v0).
+    Map belief + observation to a macro coaching label (v1 baseline).
     """
-    top_region = max(belief, key=belief.get)
-    top_prob = belief[top_region]
+    danger = max(belief, key=belief.get)
+    danger_prob = belief[danger]
 
-    # If time is low and belief is confident, recommend rotate to the likely site
-    if obs.time_left <= 25 and top_prob >= 0.55:
-        if top_region == "A":
-            return "ROTATE_A"
-        if top_region == "B":
-            return "ROTATE_B"
+    # Hard rule: extremely low money => SAVE
+    if obs.money < 1000:
+        return "SAVE"
 
-    # If belief not confident, suggest holding or playing safe depending on time
-    if top_prob < 0.55:
-        return "HOLD" if obs.time_left > 25 else "PLAY_SAFE"
+    # If we are outnumbered and have a rifle but low money => SAVE (keep the rifle)
+    if obs.has_rifle and obs.money < 2000 and obs.team_alive <= 1 and obs.enemy_alive >= 3:
+        return "SAVE"
 
-    # Otherwise, default conservative
-    return "REPOSITION"
+    # High danger and not enough money => play safe / save
+    if danger == "HIGH" and danger_prob >= 0.45:
+        return "PLAY_SAFE" if obs.money >= 2000 else "SAVE"
+
+    # Economy decisions (coarse)
+    if obs.money >= 4000:
+        return "BUY"
+    if 2000 <= obs.money < 4000:
+        return "FORCE_BUY"
+
+    # Default
+    return "PLAY_SAFE"
 
 
 def run_once(obs_dict: Dict) -> Tuple[Dict[str, float], str]:
@@ -96,26 +144,44 @@ def run_once(obs_dict: Dict) -> Tuple[Dict[str, float], str]:
 
 
 if __name__ == "__main__":
-    # Example 1: VPR provides probabilities
+    # Case 1: Example mentioned by team discussion -> expect SAVE
     example_obs_1 = {
-        "time_left": 22,
-        "teammate_death_site": "B",
-        "place_probs": {"A": 0.20, "B": 0.70, "MID": 0.10},
-        "smoke_A": False,
-        "smoke_B": True,
-        "saw_enemy_A": False,
-        "saw_enemy_B": False,
+        "time_left": 60,
+        "team_alive": 0,
+        "enemy_alive": 5,
+        "hp": 100,
+        "armor": 100,
+        "money": 200,
+        "has_rifle": True,
     }
     belief, label = run_once(example_obs_1)
-    print("[probs] belief =", belief)
-    print("[probs] label  =", label)
+    print("[case1] belief =", belief)
+    print("[case1] label  =", label)
 
-    # Example 2: VPR provides only top-1 place_id
+    # Case 2: Good money -> expect BUY
     example_obs_2 = {
-        "time_left": 22,
-        "teammate_death_site": "B",
-        "place_id": "B",
+        "time_left": 70,
+        "team_alive": 5,
+        "enemy_alive": 5,
+        "hp": 100,
+        "armor": 100,
+        "money": 5200,
+        "has_rifle": False,
     }
     belief, label = run_once(example_obs_2)
-    print("[id] belief =", belief)
-    print("[id] label  =", label)
+    print("[case2] belief =", belief)
+    print("[case2] label  =", label)
+
+    # Case 3: Medium money -> expect FORCE_BUY
+    example_obs_3 = {
+        "time_left": 55,
+        "team_alive": 3,
+        "enemy_alive": 4,
+        "hp": 80,
+        "armor": 60,
+        "money": 3000,
+        "has_rifle": False,
+    }
+    belief, label = run_once(example_obs_3)
+    print("[case3] belief =", belief)
+    print("[case3] label  =", label)
