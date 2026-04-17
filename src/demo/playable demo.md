@@ -8,4 +8,4 @@ If you want to view this demo in CS2 on Steam, drop this demo file under
 
 Then run this command in game terminal: `playdemo 260319mirage`
 
-https://github.com/users/kohlz/projects/2
+https://drive.google.com/file/d/1XNEOfgJn6vJRyLFSHoqVE3pRXAxQoXx2/view?usp=sharing
