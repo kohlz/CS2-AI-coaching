@@ -1,25 +1,9 @@
 """
 callouts_mirage.py
 
-Map XYZ game coordinates to named callout regions on de_mirage.
-
-Coordinate system (CS2, verified via in-game screenshots):
-  - X-axis: negative = CT side (left), positive = T side (right)
-  - Y-axis: positive = B side (top of radar), negative = A side (bottom)
-  - Z-axis: elevation (negative = ground level)
-
-Regions are defined as axis-aligned bounding boxes [x_min, x_max, y_min, y_max].
-When regions overlap, the first match in CALLOUTS wins (more specific regions
-are listed before broader ones).
-
-Usage
------
-    from callouts_mirage import get_callout, get_zone
-
-    name = get_callout(-1969, 450)    # "B site"
-    zone = get_zone(-1969, 450)       # "B"
-    name = get_callout(-500, -2000)   # "A site"
-    zone = get_zone(-500, -2000)      # "A"
+Map XYZ game coordinates to named callout regions on de_mirage using
+axis-aligned bounding boxes, and group them into coarse zones for the
+POMDP / HMM models.
 """
 
 from __future__ import annotations
@@ -98,11 +82,7 @@ ZONES = ["A", "B", "MID", "CT_BASE", "T_BASE"]
 
 
 def get_callout(x: float, y: float) -> str:
-    """Return the named callout for game coordinates (x, y).
-
-    When no bounding box matches, returns ``"unknown (x, y)"`` so the
-    raw coordinates are preserved for training / downstream matching.
-    """
+    """Return the named callout for (x, y), or an ``"unknown (x, y)"`` string."""
     for name, (x_min, x_max, y_min, y_max) in CALLOUTS:
         if x_min <= x <= x_max and y_min <= y <= y_max:
             return name
@@ -110,13 +90,10 @@ def get_callout(x: float, y: float) -> str:
 
 
 def get_zone(x: float, y: float) -> str:
-    """Return the coarse zone (A, B, MID, CT_BASE, T_BASE) for (x, y).
-
-    Unknown positions include raw coordinates for training use.
-    """
+    """Return the coarse zone (A, B, MID, CT_BASE, T_BASE) for (x, y)."""
     callout = get_callout(x, y)
     if callout.startswith("unknown"):
-        return callout  # pass through with coordinates
+        return callout
     return ZONE_MAP.get(callout, f"unknown ({x:.0f}, {y:.0f})")
 
 
@@ -133,7 +110,7 @@ def get_callout_center(name: str) -> Optional[tuple[float, float]]:
 # ---------------------------------------------------------------------------
 
 def coverage_report(positions: list[tuple[float, float]]) -> dict[str, int]:
-    """Count how many positions map to each callout.  'unknown' = unmapped."""
+    """Count how many positions map to each callout."""
     counts: dict[str, int] = {}
     for x, y in positions:
         c = get_callout(x, y)

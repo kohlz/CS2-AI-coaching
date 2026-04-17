@@ -1,23 +1,8 @@
 """
 info_model.py
 
-Economy HMM — Hidden Markov Model for predicting enemy team economy.
-
-Hidden state:  enemy team economy tier
-    BROKE ($0-1500), LOW ($1500-3000), MEDIUM ($3000-5000),
-    HIGH ($5000-8000), RICH ($8000+)
-
-Observations (per round, based on PREVIOUS round's outcome):
-    1. Round result (win/loss)
-    2. How the round ended (elimination, bomb, time, close, dominant)
-    3. Weapons seen in killfeed (pistol-only, SMG, rifle, AWP)
-    4. Number of enemy survivors
-    5. Win/loss streak
-
-References:
-    - Zeng et al. (2020) "Learning to Reason in Round-based Games"
-    - Xenopoulos et al. (2021) "Optimal Team Economic Decisions in CS"
-    - StarCraft opponent modeling with Bayesian/HMM approaches
+Single source of truth for CS2 economy rules and the Economy HMM that
+predicts the enemy team's economy tier from per-round observations.
 """
 
 from __future__ import annotations
@@ -25,6 +10,101 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from typing import Optional
+
+# ===========================================================================
+# CS2 Economy Constants
+# ===========================================================================
+
+MONEY_CAP = 16_000
+STARTING_MONEY = 800
+
+LOSS_BONUS = [1_400, 1_900, 2_400, 2_900, 3_400]  # indexed by streak-1
+MAX_LOSS_STREAK = 5
+
+WIN_REWARD_ELIM = 3_250
+WIN_REWARD_BOMB = 3_500     # T win by bomb explosion
+WIN_REWARD_DEFUSE = 3_500   # CT win by defuse
+
+T_BOMB_PLANT_BONUS = 800    # all T players, even on loss
+
+KILL_REWARDS = {
+    "knife": 1500, "bayonet": 1500,
+    "nova": 900, "mag7": 900, "sawedoff": 900,
+    "mp9": 600, "mp7": 600, "mp5sd": 600, "ump45": 600,
+    "mac10": 600, "bizon": 600,
+    "xm1014": 300, "p90": 300,
+    "glock": 300, "hkp2000": 300, "usp_silencer": 300, "elite": 300,
+    "p250": 300, "fiveseven": 300, "tec9": 300, "deagle": 300,
+    "cz75a": 300, "revolver": 300,
+    "ak47": 300, "m4a1": 300, "m4a1_silencer": 300, "sg556": 300,
+    "aug": 300, "galilar": 300, "famas": 300,
+    "m249": 300, "negev": 300,
+    "hegrenade": 300, "inferno": 300, "molotov": 300,
+    "awp": 100, "ssg08": 300, "g3sg1": 300, "scar20": 300,
+    "taser": 100,
+}
+
+CT_KILL_SHARE_BONUS = 50    # per CT per T kill (max $250)
+
+AVG_KILL_INCOME_WIN = 600    # ~2 kills * $300 avg
+AVG_KILL_INCOME_LOSS = 200   # ~0.6 kills * $300
+T_PLANT_RATE_ON_LOSS = 0.35  # bomb planted in ~35% of T round losses
+CT_KILL_BONUS_WIN = 200      # ~4 T kills * $50
+CT_KILL_BONUS_LOSS = 75      # ~1.5 T kills * $50
+
+
+# ---------------------------------------------------------------------------
+# Economy helper functions (shared by HMM + MDP)
+# ---------------------------------------------------------------------------
+
+def loss_bonus(streak: int) -> int:
+    """Loss bonus received after accumulating ``streak`` consecutive losses."""
+    if streak <= 0:
+        return 0
+    idx = min(streak, MAX_LOSS_STREAK) - 1
+    return LOSS_BONUS[idx]
+
+
+def next_money_win(side: str, money_after_buy: int) -> int:
+    """Money at the start of next round after winning."""
+    income = WIN_REWARD_ELIM + AVG_KILL_INCOME_WIN
+    if side == "CT":
+        income += CT_KILL_BONUS_WIN
+        income += (WIN_REWARD_DEFUSE - WIN_REWARD_ELIM) * 0.5
+    else:
+        income += (WIN_REWARD_BOMB - WIN_REWARD_ELIM) * 0.5
+    return min(money_after_buy + int(income), MONEY_CAP)
+
+
+def next_money_loss(side: str, money_after_buy: int, new_streak: int) -> int:
+    """Money at the start of next round after losing."""
+    income = loss_bonus(new_streak) + AVG_KILL_INCOME_LOSS
+    if side == "T":
+        income += int(T_BOMB_PLANT_BONUS * T_PLANT_RATE_ON_LOSS)
+    else:
+        income += CT_KILL_BONUS_LOSS
+    return min(money_after_buy + int(income), MONEY_CAP)
+
+
+def expected_income_after_loss(streak: int, side: str) -> int:
+    """Approximate total income a team receives after a loss with given streak."""
+    return loss_bonus(streak) + AVG_KILL_INCOME_LOSS + (
+        int(T_BOMB_PLANT_BONUS * T_PLANT_RATE_ON_LOSS) if side == "T"
+        else CT_KILL_BONUS_LOSS)
+
+
+def money_to_tier(money: float) -> str:
+    """Map a dollar amount to an economy tier string."""
+    if money < 1500:
+        return "BROKE"
+    if money < 3000:
+        return "LOW"
+    if money < 5000:
+        return "MEDIUM"
+    if money < 8000:
+        return "HIGH"
+    return "RICH"
+
 
 # ---------------------------------------------------------------------------
 # Economy tiers
@@ -70,48 +150,51 @@ class EconObservation:
 # Transition model: P(tier_t | tier_{t-1}, enemy_won_prev)
 # ---------------------------------------------------------------------------
 
-# CS2 loss bonuses: 1st loss $1400, 2nd $1900, 3rd $2400, 4th $2900, 5th+ $3400
-# Win reward: $3250 base (T) or $3250 (CT), plus kill rewards ~$300-600/kill
-
-def _build_transition_matrix() -> dict[str, dict[bool, dict[str, float]]]:
+def _derive_transition_matrix() -> dict[str, dict[bool, dict[str, float]]]:
     """Build P(next_tier | current_tier, enemy_won_previous_round)."""
-    T = {}
+    T: dict[str, dict[bool, dict[str, float]]] = {}
 
-    # After enemy WIN — they get $3250+ and keep equipment
-    T["BROKE"] = {
-        True:  {"BROKE": 0.02, "LOW": 0.15, "MEDIUM": 0.50, "HIGH": 0.28, "RICH": 0.05},
-        False: {"BROKE": 0.10, "LOW": 0.55, "MEDIUM": 0.25, "HIGH": 0.08, "RICH": 0.02},
-    }
-    T["LOW"] = {
-        True:  {"BROKE": 0.01, "LOW": 0.05, "MEDIUM": 0.30, "HIGH": 0.45, "RICH": 0.19},
-        False: {"BROKE": 0.15, "LOW": 0.40, "MEDIUM": 0.30, "HIGH": 0.12, "RICH": 0.03},
-    }
-    T["MEDIUM"] = {
-        True:  {"BROKE": 0.01, "LOW": 0.03, "MEDIUM": 0.15, "HIGH": 0.45, "RICH": 0.36},
-        False: {"BROKE": 0.20, "LOW": 0.35, "MEDIUM": 0.30, "HIGH": 0.12, "RICH": 0.03},
-    }
-    T["HIGH"] = {
-        True:  {"BROKE": 0.01, "LOW": 0.02, "MEDIUM": 0.07, "HIGH": 0.35, "RICH": 0.55},
-        False: {"BROKE": 0.25, "LOW": 0.30, "MEDIUM": 0.25, "HIGH": 0.15, "RICH": 0.05},
-    }
-    T["RICH"] = {
-        True:  {"BROKE": 0.01, "LOW": 0.02, "MEDIUM": 0.05, "HIGH": 0.22, "RICH": 0.70},
-        False: {"BROKE": 0.30, "LOW": 0.30, "MEDIUM": 0.20, "HIGH": 0.12, "RICH": 0.08},
-    }
+    for tier in ECON_TIERS:
+        T[tier] = {True: {}, False: {}}
+        lo, hi = TIER_MONEY_RANGES[tier]
+        mid = (lo + hi) / 2.0
+
+        win_income = WIN_REWARD_ELIM + AVG_KILL_INCOME_WIN
+        expected_after_win = min(mid + win_income, MONEY_CAP)
+        raw_win = {}
+        for t2 in ECON_TIERS:
+            t2_lo, t2_hi = TIER_MONEY_RANGES[t2]
+            t2_mid = (t2_lo + t2_hi) / 2.0
+            dist = abs(expected_after_win - t2_mid)
+            raw_win[t2] = math.exp(-dist / 3000.0)
+        s = sum(raw_win.values())
+        T[tier][True] = {t2: v / s for t2, v in raw_win.items()}
+
+        raw_loss = {t2: 0.0 for t2 in ECON_TIERS}
+        streak_weights = {1: 0.40, 2: 0.30, 3: 0.15, 4: 0.10, 5: 0.05}
+        for streak, w in streak_weights.items():
+            bonus = loss_bonus(streak)
+            expected_after_loss = min(mid * 0.3 + bonus + AVG_KILL_INCOME_LOSS,
+                                     MONEY_CAP)
+            for t2 in ECON_TIERS:
+                t2_lo, t2_hi = TIER_MONEY_RANGES[t2]
+                t2_mid = (t2_lo + t2_hi) / 2.0
+                dist = abs(expected_after_loss - t2_mid)
+                raw_loss[t2] += w * math.exp(-dist / 2500.0)
+        s = sum(raw_loss.values())
+        T[tier][False] = {t2: v / s for t2, v in raw_loss.items()}
 
     return T
 
 
-TRANSITION = _build_transition_matrix()
+TRANSITION = _derive_transition_matrix()
 
 
 # ---------------------------------------------------------------------------
 # Emission model: P(observation features | economy tier)
 # ---------------------------------------------------------------------------
 
-# P(best_weapon_seen | tier) — what weapons enemies use reveals their money
 _WEAPON_EMISSION = {
-    #                  pistol   smg    rifle   awp   unknown
     "BROKE":  {"pistol": 0.75, "smg": 0.10, "rifle": 0.05, "awp": 0.01, "unknown": 0.09},
     "LOW":    {"pistol": 0.30, "smg": 0.35, "rifle": 0.20, "awp": 0.02, "unknown": 0.13},
     "MEDIUM": {"pistol": 0.10, "smg": 0.20, "rifle": 0.50, "awp": 0.08, "unknown": 0.12},
@@ -119,9 +202,7 @@ _WEAPON_EMISSION = {
     "RICH":   {"pistol": 0.03, "smg": 0.05, "rifle": 0.45, "awp": 0.37, "unknown": 0.10},
 }
 
-# P(round_end_type | tier) — how round ends is influenced by enemy economy
 _END_TYPE_EMISSION = {
-    #                  elimination  bomb    time   close  dominant
     "BROKE":  {"elimination": 0.25, "bomb": 0.15, "time": 0.25, "close": 0.20, "dominant": 0.15},
     "LOW":    {"elimination": 0.20, "bomb": 0.20, "time": 0.15, "close": 0.25, "dominant": 0.20},
     "MEDIUM": {"elimination": 0.18, "bomb": 0.25, "time": 0.10, "close": 0.22, "dominant": 0.25},
@@ -129,9 +210,7 @@ _END_TYPE_EMISSION = {
     "RICH":   {"elimination": 0.12, "bomb": 0.35, "time": 0.05, "close": 0.13, "dominant": 0.35},
 }
 
-# P(survivors_bucket | tier)
 _SURVIVORS_EMISSION = {
-    #                  0      1      2      3+
     "BROKE":  {0: 0.50, 1: 0.25, 2: 0.15, 3: 0.10},
     "LOW":    {0: 0.35, 1: 0.30, 2: 0.20, 3: 0.15},
     "MEDIUM": {0: 0.25, 1: 0.25, 2: 0.25, 3: 0.25},
@@ -139,12 +218,25 @@ _SURVIVORS_EMISSION = {
     "RICH":   {0: 0.10, 1: 0.15, 2: 0.30, 3: 0.45},
 }
 
+_LOSS_STREAK_EMISSION = {
+    "BROKE":  {0: 0.10, 1: 0.20, 2: 0.25, 3: 0.25, 4: 0.20},
+    "LOW":    {0: 0.20, 1: 0.30, 2: 0.25, 3: 0.15, 4: 0.10},
+    "MEDIUM": {0: 0.35, 1: 0.25, 2: 0.20, 3: 0.12, 4: 0.08},
+    "HIGH":   {0: 0.50, 1: 0.25, 2: 0.12, 3: 0.08, 4: 0.05},
+    "RICH":   {0: 0.60, 1: 0.20, 2: 0.10, 3: 0.06, 4: 0.04},
+}
+
+_WIN_STREAK_EMISSION = {
+    "BROKE":  {0: 0.60, 1: 0.20, 2: 0.10, 3: 0.06, 4: 0.04},
+    "LOW":    {0: 0.50, 1: 0.25, 2: 0.12, 3: 0.08, 4: 0.05},
+    "MEDIUM": {0: 0.35, 1: 0.25, 2: 0.20, 3: 0.12, 4: 0.08},
+    "HIGH":   {0: 0.20, 1: 0.25, 2: 0.25, 3: 0.18, 4: 0.12},
+    "RICH":   {0: 0.10, 1: 0.20, 2: 0.25, 3: 0.25, 4: 0.20},
+}
+
 
 def _emission_prob(obs: EconObservation, tier: str) -> float:
-    """P(observation | economy tier).
-
-    Combines weapon, end-type, and survivors sub-models multiplicatively.
-    """
+    """P(observation | economy tier)."""
     p = 1.0
 
     # Weapon signal
@@ -159,6 +251,16 @@ def _emission_prob(obs: EconObservation, tier: str) -> float:
     surv_bucket = min(obs.enemy_survivors, 3)
     surv_probs = _SURVIVORS_EMISSION.get(tier, {})
     p *= surv_probs.get(surv_bucket, 0.25)
+
+    # Loss streak signal
+    loss_bucket = min(obs.enemy_loss_streak, 4)
+    loss_probs = _LOSS_STREAK_EMISSION.get(tier, {})
+    p *= loss_probs.get(loss_bucket, 0.20)
+
+    # Win streak signal
+    win_bucket = min(obs.enemy_win_streak, 4)
+    win_probs = _WIN_STREAK_EMISSION.get(tier, {})
+    p *= win_probs.get(win_bucket, 0.20)
 
     return max(p, 1e-12)
 
@@ -328,11 +430,7 @@ def build_economy_observations(
     rounds: list,
     target_player: str,
 ) -> list[EconObservation]:
-    """Build economy observations from match rounds.
-
-    For round i, the observation is based on what happened in round i-1.
-    The first round has no previous data, so we skip it.
-    """
+    """Build economy observations from match rounds (one per round after the first)."""
     observations = []
 
     enemy_loss_streak = 0
@@ -377,10 +475,9 @@ def predict_enemy_economy(
     rounds: list,
     target_player: str,
 ) -> list[dict]:
-    """Run the Economy HMM across a match, returning per-round predictions.
+    """Run the Economy HMM across a match and return one prediction per round.
 
-    Returns a list with one entry per round (first round gets uniform prior).
-    Each entry: {round_num, predicted_tier, tier_probs, predicted_avg_money}
+    Each entry: {round_num, predicted_tier, tier_probs, predicted_avg_money}.
     """
     hmm = EconomyHMM()
     results = []

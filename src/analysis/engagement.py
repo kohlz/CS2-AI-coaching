@@ -1,24 +1,9 @@
 """
 engagement.py
 
-Heuristic engagement analysis for a target player across a match.
-
-Analyzes:
-  1. Trade kills — when a teammate dies, how quickly does the player engage?
-  2. Isolated deaths — dying with no teammate nearby to trade.
-  3. Opening duels — first kill of the round (won or lost).
-  4. Utility usage — how many nades thrown per round vs. economy tier.
-  5. Impact kills — multi-kills, clutch kills, entry frags.
-
-All analysis is driven by the structured RoundData from demo_parser.py;
-no raw demo file access is needed.
-
-Usage
------
-    from engagement import analyze_engagement, engagement_summary
-
-    evals = analyze_engagement(match.rounds, "k_z_")
-    summary = engagement_summary(evals)
+Heuristic engagement analysis for a target player across a match,
+covering trades, isolated deaths, opening duels, utility usage, and
+impact kills. Operates on structured RoundData from demo_parser.
 """
 
 from __future__ import annotations
@@ -145,7 +130,6 @@ def analyze_engagement(
             if victim not in teammates:
                 continue
 
-            # Did target player trade this death?
             traded = False
             for kt in target_kill_ticks:
                 if 0 < (kt - e.tick) <= TRADE_WINDOW_SEC * TICK_RATE:

@@ -1,19 +1,12 @@
 """
 training_data.py
 
-Batch-extract training features from multiple CS2 demo files for:
-  1. Round win probability estimator  (NN)
-  2. T-side attack site predictor     (NN)
-  3. CT defensive formation classifier (NN)
-  4. Mid-round tactical Q-learning    (RL)
+Batch-extract training features from CS2 demo files for the round-level NN,
+attack-site NN, CT formation classifier, and tactical Q-learning models.
 
-Usage
------
-    from training_data import extract_all
-
-    data = extract_all("src/demo")
-    round_df  = data["rounds"]           # one row per round
-    rl_df     = data["rl_transitions"]   # one row per time-step per player
+Public functions:
+  extract_all        — parse all demos under a directory into training DataFrames.
+  discover_demos     — find all .dem files recursively under a base directory.
 """
 
 from __future__ import annotations
@@ -54,9 +47,22 @@ UTILITY_ITEMS = {
 RL_ACTIONS = ["ROTATE_A", "ROTATE_B", "HOLD", "PUSH", "FALL_BACK"]
 RL_ACTION_IDX = {a: i for i, a in enumerate(RL_ACTIONS)}
 
-# RL v2 actions (micro-decision level)
+# RL v2 actions (legacy, unified)
 RL_ACTIONS_V2 = ["PEEK", "HOLD", "TRADE", "FALL_BACK", "UTILITY", "ROTATE"]
 RL_ACTION_V2_IDX = {a: i for i, a in enumerate(RL_ACTIONS_V2)}
+
+# Side-specific RL actions (new split Q-learners)
+T_ACTIONS = ["EXECUTE", "PEEK", "TRADE", "FALL_BACK", "UTILITY", "LURK"]
+T_ACTION_IDX = {a: i for i, a in enumerate(T_ACTIONS)}
+CT_ACTIONS = ["HOLD", "ROTATE", "RETAKE", "PUSH", "FALL_BACK", "UTILITY"]
+CT_ACTION_IDX = {a: i for i, a in enumerate(CT_ACTIONS)}
+
+# Team support bins
+TEAM_SUPPORT_ALONE = 0
+TEAM_SUPPORT_SUPPORTED = 1
+TEAM_SUPPORT_GROUPED = 2
+
+REWARD_NORMALIZER = 5.0
 
 # Zone aggression: how deep into enemy territory (0=safest, 3=deepest)
 _CT_AGGRESSION = {"CT_BASE": 0, "A": 1, "B": 1, "MID": 2, "T_BASE": 3}
@@ -67,7 +73,7 @@ RECENT_EVENTS = ["none", "teammate_died", "enemy_killed", "grenade", "bomb_plant
 RECENT_EVENT_IDX = {e: i for i, e in enumerate(RECENT_EVENTS)}
 
 # Event types for sequence model
-SEQ_EVENT_TYPES = ["kill", "smoke", "flash", "he", "plant"]
+SEQ_EVENT_TYPES = ["kill", "smoke", "flash", "he", "plant", "molotov"]
 SEQ_EVENT_IDX = {e: i for i, e in enumerate(SEQ_EVENT_TYPES)}
 SEQ_ZONES = ["A", "B", "MID", "CT_BASE", "T_BASE"]
 SEQ_ZONE_IDX = {z: i for i, z in enumerate(SEQ_ZONES)}
@@ -79,6 +85,42 @@ def _team_str(team_num) -> str:
     if team_num == 3:
         return "CT"
     return "?"
+
+
+# ---------------------------------------------------------------------------
+# Knife-round detection
+# ---------------------------------------------------------------------------
+
+def _is_knife_round(round_deaths_df: pd.DataFrame) -> bool:
+    """Return True if this round looks like a knife/side-selection round."""
+    if round_deaths_df is None or len(round_deaths_df) == 0:
+        return False
+    if "weapon" not in round_deaths_df.columns:
+        return False
+    weapons = [str(w).lower() for w in round_deaths_df["weapon"].tolist()]
+    weapons = [w for w in weapons if w and w != "nan"]
+    if not weapons:
+        return False
+    knife_kills = sum(1 for w in weapons if "knife" in w or w == "taser")
+    return knife_kills == len(weapons)
+
+
+def _knife_round_mask(parser: DemoParser, freeze_ends: list[int],
+                      round_ends: list[int]) -> list[bool]:
+    """Return a boolean mask, one per round, True if it's a knife round."""
+    deaths = _safe_parse_event(parser, "player_death",
+                               player=["team_num"])
+    n = min(len(freeze_ends), len(round_ends))
+    mask: list[bool] = []
+    for i in range(n):
+        fe = freeze_ends[i]
+        end = round_ends[i]
+        if deaths.empty or "tick" not in deaths.columns:
+            mask.append(False)
+            continue
+        rd = deaths[(deaths["tick"] >= fe) & (deaths["tick"] <= end)]
+        mask.append(_is_knife_round(rd))
+    return mask
 
 
 # ---------------------------------------------------------------------------
@@ -153,11 +195,15 @@ def _extract_round_features(parser: DemoParser, demo_path: str) -> pd.DataFrame:
     flashes = parser.parse_event("flashbang_detonate", player=["X", "Y", "Z"])
 
     n_rounds = min(len(freeze_ends), len(round_ends))
+    knife_mask = _knife_round_mask(parser, freeze_ends[:n_rounds],
+                                    round_ends[:n_rounds])
     rows = []
     t_loss_streak = 0
     ct_loss_streak = 0
 
     for i in range(n_rounds):
+        if knife_mask[i]:
+            continue  # skip knife rounds
         fe_tick = freeze_ends[i]
         end_tick = round_ends[i]
 
@@ -327,6 +373,57 @@ def _extract_round_features(parser: DemoParser, demo_path: str) -> pd.DataFrame:
             t_loss_streak = 0
             ct_loss_streak = 0
 
+    # Compute prior-round tendency features
+    rounds_since_plant_A = 999
+    rounds_since_plant_B = 999
+    last_plant_site = ""
+    streak_same_site = 0
+    prev_row: dict | None = None
+    for idx, row in enumerate(rows):
+        is_half_start = (row["round_in_half"] == 0)
+
+        if is_half_start or prev_row is None:
+            row["prev_plant_A"] = 0
+            row["prev_plant_B"] = 0
+            row["prev_plant_none"] = 0
+            row["prev_no_history"] = 1
+            row["prev_t_won"] = 0.5
+            row["prev_t_tier"] = 0.0
+            row["prev_ct_tier"] = 0.0
+            row["rounds_since_plant_A"] = 1.0
+            row["rounds_since_plant_B"] = 1.0
+            row["streak_same_site"] = 0.0
+            rounds_since_plant_A = 999
+            rounds_since_plant_B = 999
+            last_plant_site = ""
+            streak_same_site = 0
+        else:
+            prev_site = prev_row.get("attack_site", "no_plant")
+            row["prev_plant_A"] = int(prev_site == "A")
+            row["prev_plant_B"] = int(prev_site == "B")
+            row["prev_plant_none"] = int(prev_site == "no_plant")
+            row["prev_no_history"] = 0
+            row["prev_t_won"] = float(prev_row.get("t_won", 0))
+            row["prev_t_tier"] = prev_row.get("t_equip_tier", 0) / 2.0
+            row["prev_ct_tier"] = prev_row.get("ct_equip_tier", 0) / 2.0
+            row["rounds_since_plant_A"] = min(rounds_since_plant_A, 6) / 6.0
+            row["rounds_since_plant_B"] = min(rounds_since_plant_B, 6) / 6.0
+            row["streak_same_site"] = min(streak_same_site, 3) / 3.0
+
+        cur_site = row.get("attack_site", "no_plant")
+        rounds_since_plant_A = 0 if cur_site == "A" else rounds_since_plant_A + 1
+        rounds_since_plant_B = 0 if cur_site == "B" else rounds_since_plant_B + 1
+        if cur_site in ("A", "B"):
+            if cur_site == last_plant_site:
+                streak_same_site += 1
+            else:
+                streak_same_site = 1
+            last_plant_site = cur_site
+        else:
+            streak_same_site = 0
+
+        prev_row = row
+
     return pd.DataFrame(rows)
 
 
@@ -354,11 +451,15 @@ def _extract_rl_transitions(parser: DemoParser, demo_path: str) -> pd.DataFrame:
                                player=["X", "Y", "Z", "team_num"])
 
     n_rounds = min(len(freeze_ends), len(round_ends))
+    knife_mask = _knife_round_mask(parser, freeze_ends[:n_rounds],
+                                    round_ends[:n_rounds])
 
     # Build sample ticks (every 5 seconds)
     sample_ticks_by_round: dict[int, list[int]] = {}
     all_sample_ticks: list[int] = []
     for i in range(n_rounds):
+        if knife_mask[i]:
+            continue
         fe = freeze_ends[i]
         end = round_ends[i]
         ticks = list(range(fe, end + 1, 5 * TICK_RATE))
@@ -408,7 +509,9 @@ def _extract_rl_transitions(parser: DemoParser, demo_path: str) -> pd.DataFrame:
 
     rows = []
     for i in range(n_rounds):
-        ticks = sample_ticks_by_round[i]
+        if knife_mask[i]:
+            continue
+        ticks = sample_ticks_by_round.get(i, [])
         fe = freeze_ends[i]
         winner = round_winners.get(i, "CT")
         plant_tick, plant_site = bomb_info[i]
@@ -519,20 +622,17 @@ def _classify_action_v2(
 ) -> int:
     """Classify a player's micro-action in a 5s window.
 
-    Priority: UTILITY > TRADE > zone-based (PEEK / FALL_BACK / ROTATE) > HOLD
+    Priority: UTILITY > TRADE > zone-based (PEEK / FALL_BACK / ROTATE) > HOLD.
     """
-    # 1. UTILITY — player threw a grenade in this window
     for g in grenades_window:
         if g["thrower"] == player_name:
             return RL_ACTION_V2_IDX["UTILITY"]
 
-    # 2. TRADE — a teammate died in this window AND player got a kill
     if teammate_deaths_window:
         for k in kills_window:
             if k["attacker"] == player_name:
                 return RL_ACTION_V2_IDX["TRADE"]
 
-    # 3. Zone-change-based actions
     agg = _CT_AGGRESSION if side == "CT" else _T_AGGRESSION
     cur_agg = agg.get(zone, 1)
     nxt_agg = agg.get(next_zone, 1)
@@ -580,6 +680,283 @@ def _recent_event_category(
     return RECENT_EVENT_IDX["none"]
 
 
+# Adjacent zones for team_support calculation
+_ADJACENT_ZONES = {
+    "A":       {"A", "MID"},
+    "B":       {"B", "MID"},
+    "MID":     {"MID", "A", "B", "CT_BASE", "T_BASE"},
+    "CT_BASE": {"CT_BASE", "MID", "A", "B"},
+    "T_BASE":  {"T_BASE", "MID"},
+}
+
+
+def _compute_team_support(
+    player_zone: str,
+    player_name: str,
+    side: str,
+    snap: pd.DataFrame,
+) -> int:
+    """Count teammates in same or adjacent zone and return support bin."""
+    adj = _ADJACENT_ZONES.get(player_zone, {player_zone})
+    team_num = 2 if side == "T" else 3
+    teammates = snap[(snap["team_num"] == team_num) &
+                     (snap["is_alive"] == True) &
+                     (snap["name"] != player_name)]
+    count = 0
+    for _, row in teammates.iterrows():
+        tz = get_zone(row["X"], row["Y"])
+        if tz in adj:
+            count += 1
+    if count == 0:
+        return TEAM_SUPPORT_ALONE
+    if count == 1:
+        return TEAM_SUPPORT_SUPPORTED
+    return TEAM_SUPPORT_GROUPED
+
+
+def _classify_action_side_specific(
+    side: str, zone: str, next_zone: str,
+    player_name: str, tick: int, next_tick: int,
+    kills_window: list[dict],
+    teammate_deaths_window: list[dict],
+    grenades_window: list[dict],
+    bomb_planted: bool,
+) -> int:
+    """Classify a player's micro-action using side-specific action spaces."""
+    # Utility thrown
+    for g in grenades_window:
+        if g["thrower"] == player_name:
+            return T_ACTION_IDX["UTILITY"] if side == "T" else CT_ACTION_IDX["UTILITY"]
+
+    # Trade: teammate died AND player got a kill
+    if teammate_deaths_window:
+        for k in kills_window:
+            if k["attacker"] == player_name:
+                return T_ACTION_IDX["TRADE"] if side == "T" else CT_ACTION_IDX["PUSH"]
+
+    agg = _CT_AGGRESSION if side == "CT" else _T_AGGRESSION
+    cur_agg = agg.get(zone, 1)
+    nxt_agg = agg.get(next_zone, 1)
+
+    if side == "T":
+        if zone == next_zone:
+            if bomb_planted:
+                return T_ACTION_IDX["EXECUTE"]
+            return T_ACTION_IDX["LURK"] if cur_agg <= 1 else T_ACTION_IDX["PEEK"]
+        if nxt_agg > cur_agg:
+            return T_ACTION_IDX["EXECUTE"] if bomb_planted else T_ACTION_IDX["PEEK"]
+        if nxt_agg < cur_agg:
+            return T_ACTION_IDX["FALL_BACK"]
+        return T_ACTION_IDX["LURK"]
+    else:  # CT
+        if zone == next_zone:
+            return CT_ACTION_IDX["HOLD"]
+        if bomb_planted and next_zone in ("A", "B"):
+            return CT_ACTION_IDX["RETAKE"]
+        if nxt_agg > cur_agg:
+            return CT_ACTION_IDX["PUSH"]
+        if nxt_agg < cur_agg:
+            return CT_ACTION_IDX["FALL_BACK"]
+        return CT_ACTION_IDX["ROTATE"]
+
+
+# ---------------------------------------------------------------------------
+# CT formation label extraction (for FormationClassifier_CT LSTM)
+# ---------------------------------------------------------------------------
+
+# All valid formations per alive count
+CT_FORMATIONS_BY_ALIVE = {
+    5: ["2-1-2", "1-2-2", "3-1-1", "1-1-3", "2-2-1", "0-2-3", "2-0-3", "other"],
+    4: ["2-1-1", "1-2-1", "1-1-2", "2-0-2", "0-2-2", "3-1-0", "0-1-3", "other"],
+    3: ["1-1-1", "2-1-0", "0-1-2", "2-0-1", "1-0-2", "0-2-1", "1-2-0", "other"],
+    2: ["1-0-1", "2-0-0", "0-0-2", "0-1-1", "1-1-0", "0-2-0", "other"],
+    1: ["1-0-0", "0-1-0", "0-0-1"],
+}
+
+ALL_CT_FORMATIONS = []
+CT_FORMATION_TO_IDX = {}
+for alive in sorted(CT_FORMATIONS_BY_ALIVE.keys()):
+    for fmt in CT_FORMATIONS_BY_ALIVE[alive]:
+        label = f"{alive}_{fmt}"
+        if label not in CT_FORMATION_TO_IDX:
+            CT_FORMATION_TO_IDX[label] = len(ALL_CT_FORMATIONS)
+            ALL_CT_FORMATIONS.append(label)
+N_CT_FORMATIONS = len(ALL_CT_FORMATIONS)
+
+# Build alive-mask: for each alive count, which formation indices are valid
+CT_ALIVE_MASK = {}
+for alive, fmts in CT_FORMATIONS_BY_ALIVE.items():
+    mask = [False] * N_CT_FORMATIONS
+    for fmt in fmts:
+        label = f"{alive}_{fmt}"
+        if label in CT_FORMATION_TO_IDX:
+            mask[CT_FORMATION_TO_IDX[label]] = True
+    CT_ALIVE_MASK[alive] = mask
+
+
+def _classify_ct_formation(ct_a: int, ct_mid: int, ct_b: int,
+                           ct_alive: int) -> str:
+    """Map zone counts to a formation label like '5_2-1-2'."""
+    fmt_str = f"{ct_a}-{ct_mid}-{ct_b}"
+    label = f"{ct_alive}_{fmt_str}"
+    if label in CT_FORMATION_TO_IDX:
+        return label
+    return f"{ct_alive}_other"
+
+
+def _extract_ct_formation_sequences(parser: DemoParser,
+                                    demo_path: str) -> list[dict]:
+    """Extract per-round event sequences with CT formation labels at each event."""
+    freeze_ends = sorted(_safe_parse_event(parser, "round_freeze_end")
+                         .get("tick", pd.Series(dtype=int)).tolist())
+    round_ends = sorted(set(
+        _safe_parse_event(parser, "round_officially_ended")
+        .get("tick", pd.Series(dtype=int)).tolist()
+    ))
+    deaths_df = _safe_parse_event(parser, "player_death",
+                                  player=["X", "Y", "Z", "team_num"])
+    smokes_df = _safe_parse_event(parser, "smokegrenade_detonate",
+                                  player=["X", "Y", "Z", "team_num"])
+    flashes_df = _safe_parse_event(parser, "flashbang_detonate",
+                                   player=["X", "Y", "Z", "team_num"])
+    he_df = _safe_parse_event(parser, "hegrenade_detonate",
+                              player=["X", "Y", "Z", "team_num"])
+    molotov_df = _safe_parse_event(parser, "inferno_startburn",
+                                   player=["X", "Y", "Z", "team_num"])
+    bomb_plants = _safe_parse_event(parser, "bomb_planted",
+                                    player=["X", "Y", "Z"],
+                                    other=["total_rounds_played"])
+
+    n_rounds = min(len(freeze_ends), len(round_ends))
+    knife_mask = _knife_round_mask(parser, freeze_ends[:n_rounds],
+                                    round_ends[:n_rounds])
+
+    # Collect all event ticks to sample CT positions
+    all_event_ticks: list[int] = []
+    event_ticks_by_round: dict[int, list[int]] = {}
+    for i in range(n_rounds):
+        if knife_mask[i]:
+            continue
+        fe = freeze_ends[i]
+        end = round_ends[i]
+        ticks = set()
+        for df in [deaths_df, smokes_df, flashes_df, he_df, molotov_df,
+                   bomb_plants]:
+            rd_df = df[(df["tick"] >= fe) & (df["tick"] <= end)]
+            ticks.update(rd_df["tick"].tolist())
+        sorted_ticks = sorted(ticks)
+        event_ticks_by_round[i] = sorted_ticks
+        all_event_ticks.extend(sorted_ticks)
+
+    if not all_event_ticks:
+        return []
+
+    pos_df = parser.parse_ticks(
+        ["X", "Y", "Z", "team_num", "is_alive"],
+        ticks=sorted(set(all_event_ticks)),
+    )
+
+    results = []
+    for i in range(n_rounds):
+        if knife_mask[i]:
+            continue
+        fe = freeze_ends[i]
+        end = round_ends[i]
+        round_duration = max((end - fe) / TICK_RATE, 1.0)
+
+        rd_deaths = deaths_df[(deaths_df["tick"] >= fe) & (deaths_df["tick"] <= end)]
+        rd_events: list[dict] = []
+
+        # Build event list (same format as _extract_event_sequences)
+        for _, row in rd_deaths.iterrows():
+            victim_side = _team_str(row.get("user_team_num", 0))
+            attacker_is_t = 1 if victim_side == "CT" else 0
+            vx, vy = row.get("user_X", 0), row.get("user_Y", 0)
+            zone = get_zone(float(vx), float(vy)) if vx else "MID"
+            rd_events.append({
+                "tick": int(row["tick"]),
+                "type_idx": SEQ_EVENT_IDX["kill"],
+                "actor_side_is_t": attacker_is_t,
+                "zone_idx": SEQ_ZONE_IDX.get(zone, 2),
+                "time_norm": min((int(row["tick"]) - fe) / TICK_RATE / 120.0, 1.0),
+                "is_headshot": int(row.get("headshot", 0)) if "headshot" in row.index else 0,
+            })
+
+        for gdf, gtype in [(smokes_df, "smoke"), (flashes_df, "flash"),
+                           (he_df, "he"), (molotov_df, "molotov")]:
+            rd_g = gdf[(gdf["tick"] >= fe) & (gdf["tick"] <= end)]
+            for _, row in rd_g.iterrows():
+                thrower_side = _team_str(row.get("user_team_num", 0))
+                gx, gy = row.get("user_X", 0), row.get("user_Y", 0)
+                zone = get_zone(float(gx), float(gy)) if gx else "MID"
+                rd_events.append({
+                    "tick": int(row["tick"]),
+                    "type_idx": SEQ_EVENT_IDX[gtype],
+                    "actor_side_is_t": 1 if thrower_side == "T" else 0,
+                    "zone_idx": SEQ_ZONE_IDX.get(zone, 2),
+                    "time_norm": min((int(row["tick"]) - fe) / TICK_RATE / 120.0, 1.0),
+                    "is_headshot": 0,
+                })
+
+        rd_bombs = bomb_plants[(bomb_plants["tick"] >= fe) &
+                               (bomb_plants["tick"] <= end)]
+        if len(rd_bombs) > 0:
+            bx = rd_bombs.iloc[0].get("user_X")
+            by = rd_bombs.iloc[0].get("user_Y")
+            bzone = "MID"
+            if bx is not None and by is not None:
+                bzone = get_zone(float(bx), float(by))
+            rd_events.append({
+                "tick": int(rd_bombs.iloc[0]["tick"]),
+                "type_idx": SEQ_EVENT_IDX["plant"],
+                "actor_side_is_t": 1,
+                "zone_idx": SEQ_ZONE_IDX.get(bzone, 2),
+                "time_norm": min((int(rd_bombs.iloc[0]["tick"]) - fe) / TICK_RATE / 120.0, 1.0),
+                "is_headshot": 0,
+            })
+
+        rd_events.sort(key=lambda e: e["tick"])
+
+        # At each event, compute CT formation label
+        formation_labels = []
+        ct_alive_list = []
+        for ev in rd_events:
+            ev_tick = ev["tick"]
+            snap = pos_df[(pos_df["tick"] == ev_tick) &
+                          (pos_df["team_num"] == 3) &
+                          (pos_df["is_alive"] == True)]
+            ct_alive = len(snap)
+            if ct_alive == 0:
+                break  # round over — all CTs eliminated
+
+            ct_a = sum(1 for _, r in snap.iterrows()
+                       if get_zone(r["X"], r["Y"]) == "A")
+            ct_mid = sum(1 for _, r in snap.iterrows()
+                         if get_zone(r["X"], r["Y"]) == "MID")
+            ct_b = sum(1 for _, r in snap.iterrows()
+                       if get_zone(r["X"], r["Y"]) == "B")
+
+            label = _classify_ct_formation(ct_a, ct_mid, ct_b, ct_alive)
+            formation_labels.append(label)
+            ct_alive_list.append(ct_alive)
+
+        # Trim events to match labels (stops at elimination)
+        trimmed_events = rd_events[:len(formation_labels)]
+        for e in trimmed_events:
+            del e["tick"]
+
+        if trimmed_events:
+            results.append({
+                "demo": os.path.basename(demo_path),
+                "round_num": i,
+                "events": trimmed_events,
+                "formation_labels": formation_labels,
+                "ct_alive_at_event": ct_alive_list,
+            })
+
+    return results
+
+
 def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
     """Extract v2 state-action-reward tuples with micro-decision actions
     and dual reward signals (kill + win)."""
@@ -606,8 +983,12 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
                                    player=["X", "Y", "Z", "team_num"])
     he_df = _safe_parse_event(parser, "hegrenade_detonate",
                               player=["X", "Y", "Z", "team_num"])
+    molotov_df = _safe_parse_event(parser, "inferno_startburn",
+                                   player=["X", "Y", "Z", "team_num"])
 
     n_rounds = min(len(freeze_ends), len(round_ends))
+    knife_mask = _knife_round_mask(parser, freeze_ends[:n_rounds],
+                                    round_ends[:n_rounds])
     sample_ticks_by_round: dict[int, list[int]] = {}
     all_sample_ticks: list[int] = []
     for i in range(n_rounds):
@@ -644,9 +1025,10 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
             })
         return sorted(kills, key=lambda x: x["tick"])
 
-    def _build_grenade_list(smoke_df, flash_df, he_df_, fe, end):
+    def _build_grenade_list(smoke_df, flash_df, he_df_, molotov_df_, fe, end):
         grenades = []
-        for gdf, gtype in [(smoke_df, "smoke"), (flash_df, "flash"), (he_df_, "he")]:
+        for gdf, gtype in [(smoke_df, "smoke"), (flash_df, "flash"),
+                           (he_df_, "he"), (molotov_df_, "molotov")]:
             rd = gdf[(gdf["tick"] >= fe) & (gdf["tick"] <= end)]
             for _, row in rd.iterrows():
                 gx = row.get("user_X", 0)
@@ -695,6 +1077,8 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
 
     rows = []
     for i in range(n_rounds):
+        if knife_mask[i]:
+            continue  # skip knife rounds
         ticks = sample_ticks_by_round[i]
         fe = freeze_ends[i]
         end = round_ends[i]
@@ -702,9 +1086,29 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
         plant_tick, plant_site = bomb_info[i]
 
         round_kills = _build_kill_list(deaths_df, fe, end)
-        round_grenades = _build_grenade_list(smokes_df, flashes_df, he_df, fe, end)
+        round_grenades = _build_grenade_list(smokes_df, flashes_df, he_df,
+                                             molotov_df, fe, end)
+
+        # Determine attacked site once per round
+        attacked_site = plant_site if plant_site else ""
+        if not attacked_site:
+            t_kill_zones = {"A": 0, "B": 0}
+            for k in round_kills:
+                if k["attacker_side"] == "T":
+                    kz = k.get("zone", "")
+                    if kz in t_kill_zones:
+                        t_kill_zones[kz] += 1
+            if t_kill_zones["A"] > t_kill_zones["B"]:
+                attacked_site = "A"
+            elif t_kill_zones["B"] > t_kill_zones["A"]:
+                attacked_site = "B"
+
+        round_terminated = False
 
         for t_idx in range(len(ticks) - 1):
+            if round_terminated:
+                break
+
             tick = ticks[t_idx]
             next_tick = ticks[t_idx + 1]
 
@@ -716,17 +1120,30 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
             ct_alive = int(snap[(snap["team_num"] == 3) &
                                 (snap["is_alive"] == True)].shape[0])
 
+            # Round termination: if either side is fully eliminated, stop
+            if t_alive == 0 or ct_alive == 0:
+                round_terminated = True
+                break
+
             time_elapsed = max(0.0, (tick - fe) / TICK_RATE)
+            bomb_planted_now = (plant_tick is not None and tick >= plant_tick)
             bomb_status = 0
-            if plant_tick is not None and tick >= plant_tick:
+            if bomb_planted_now:
                 bomb_status = 1 if plant_site == "A" else 2
             time_bucket = (3 if bomb_status > 0 else
                            0 if time_elapsed < 30 else
                            1 if time_elapsed < 60 else 2)
 
-            is_terminal = (t_idx == len(ticks) - 2)
+            # Check if next tick has a team wipe — if so, this is terminal
+            next_t_alive = int(next_snap[(next_snap["team_num"] == 2) &
+                                         (next_snap["is_alive"] == True)].shape[0])
+            next_ct_alive = int(next_snap[(next_snap["team_num"] == 3) &
+                                          (next_snap["is_alive"] == True)].shape[0])
+            is_terminal = (t_idx == len(ticks) - 2 or
+                           next_t_alive == 0 or next_ct_alive == 0)
+            if next_t_alive == 0 or next_ct_alive == 0:
+                round_terminated = True
 
-            # Events in this 5s window for action classification
             kills_window = [k for k in round_kills
                             if tick <= k["tick"] < next_tick]
             grenades_window = [g for g in round_grenades
@@ -755,30 +1172,26 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
                     next_zone = get_zone(nr["X"], nr["Y"])
                     next_zone_idx = ZONE_TO_IDX.get(next_zone, zone_idx)
 
-                # Teammate deaths in this window
                 teammate_deaths = [k for k in kills_window
                                    if k["victim_side"] == side
                                    and k["victim"] != name]
 
+                # Side-specific action classification
+                action_ss = _classify_action_side_specific(
+                    side, zone, next_zone, name, tick, next_tick,
+                    kills_window, teammate_deaths, grenades_window,
+                    bomb_planted_now)
+
+                # Legacy v2 action (for backward compat)
                 action = _classify_action_v2(
                     side, zone, next_zone, name, tick, next_tick,
                     kills_window, teammate_deaths, grenades_window)
 
-                # --- Determine attacked site for this round ---
-                attacked_site = plant_site if plant_site else ""
-                if not attacked_site:
-                    t_kill_zones = {"A": 0, "B": 0}
-                    for k in round_kills:
-                        if k["attacker_side"] == "T":
-                            kz = k.get("zone", "")
-                            if kz in t_kill_zones:
-                                t_kill_zones[kz] += 1
-                    if t_kill_zones["A"] > t_kill_zones["B"]:
-                        attacked_site = "A"
-                    elif t_kill_zones["B"] > t_kill_zones["A"]:
-                        attacked_site = "B"
+                # Team support
+                team_support = _compute_team_support(
+                    zone, name, side, snap)
 
-                # Dual rewards with site-alignment
+                # Dual rewards with site-alignment + normalization
                 player_got_kill = any(
                     k["attacker"] == name for k in kills_window)
                 player_died = next_player.empty
@@ -810,10 +1223,12 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
                     elif at_wrong:
                         site_reward -= 1.0
 
+                raw_combined = kill_reward + site_reward
+                normalized_reward = raw_combined / REWARD_NORMALIZER
+
                 win_reward = 0.0
                 if is_terminal:
                     win_reward = 1.0 if winner == side else 0.0
-                    # Objective bonuses
                     if side == "CT" and len(bomb_defuses[
                             (bomb_defuses["tick"] >= fe) &
                             (bomb_defuses["tick"] <= end)]) > 0:
@@ -821,7 +1236,6 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
                     if side == "T" and plant_tick is not None:
                         win_reward += 3.0
 
-                # Alive advantage from this player's perspective
                 my_alive = t_alive if side == "T" else ct_alive
                 enemy_alive = ct_alive if side == "T" else t_alive
                 alive_adv = max(-3, min(3, my_alive - enemy_alive))
@@ -842,9 +1256,11 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
                     "time_bucket": time_bucket,
                     "zone_idx": zone_idx,
                     "recent_event": recent_event,
+                    "team_support": team_support,
                     "action": action,
-                    "kill_reward": kill_reward,
-                    "site_reward": site_reward,
+                    "action_ss": action_ss,
+                    "kill_reward": normalized_reward,
+                    "site_reward": 0.0,
                     "win_reward": win_reward,
                     "is_terminal": int(is_terminal),
                     "round_won": int(winner == side),
@@ -858,14 +1274,7 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def _extract_event_sequences(parser: DemoParser, demo_path: str) -> list[dict]:
-    """Extract time-ordered event sequences per round for sequence model training.
-
-    Returns a list of dicts, one per round:
-      {"demo", "round_num", "events": list[dict], "attack_site": str}
-
-    Each event dict has keys:
-      type_idx, actor_side_is_t, zone_idx, time_norm, is_headshot
-    """
+    """Extract time-ordered event sequences per round for sequence model training."""
     freeze_ends = sorted(_safe_parse_event(parser, "round_freeze_end")
                          .get("tick", pd.Series(dtype=int)).tolist())
     round_ends = sorted(set(
@@ -880,14 +1289,20 @@ def _extract_event_sequences(parser: DemoParser, demo_path: str) -> list[dict]:
                                    player=["X", "Y", "Z", "team_num"])
     he_df = _safe_parse_event(parser, "hegrenade_detonate",
                               player=["X", "Y", "Z", "team_num"])
+    molotov_df = _safe_parse_event(parser, "inferno_startburn",
+                                   player=["X", "Y", "Z", "team_num"])
     bomb_plants = _safe_parse_event(parser, "bomb_planted",
                                     player=["X", "Y", "Z"],
                                     other=["total_rounds_played"])
 
     n_rounds = min(len(freeze_ends), len(round_ends))
+    knife_mask = _knife_round_mask(parser, freeze_ends[:n_rounds],
+                                    round_ends[:n_rounds])
     results = []
 
     for i in range(n_rounds):
+        if knife_mask[i]:
+            continue
         fe = freeze_ends[i]
         end = round_ends[i]
         round_duration = max((end - fe) / TICK_RATE, 1.0)
@@ -911,7 +1326,8 @@ def _extract_event_sequences(parser: DemoParser, demo_path: str) -> list[dict]:
             })
 
         # Grenades
-        for gdf, gtype in [(smokes_df, "smoke"), (flashes_df, "flash"), (he_df, "he")]:
+        for gdf, gtype in [(smokes_df, "smoke"), (flashes_df, "flash"),
+                           (he_df, "he"), (molotov_df, "molotov")]:
             rd_g = gdf[(gdf["tick"] >= fe) & (gdf["tick"] <= end)]
             for _, row in rd_g.iterrows():
                 thrower_side = _team_str(row.get("user_team_num", 0))
@@ -977,16 +1393,12 @@ def extract_all(
     include_rl: bool = True,
     include_rl_v2: bool = False,
     include_sequences: bool = False,
+    include_ct_formations: bool = False,
     verbose: bool = True,
 ) -> dict:
-    """Parse all demos and return training DataFrames.
-
-    Returns dict with keys:
-      "rounds"           — round-level features (NN)
-      "rl_transitions"   — v1 RL transitions (legacy)
-      "rl_v2"            — v2 RL transitions (micro-decisions)
-      "event_sequences"  — event sequences per round (LSTM)
-    """
+    """Parse all demos under ``demo_dir`` and return training DataFrames/sequences
+    keyed by ``rounds``, ``rl_transitions``, ``rl_v2``, ``event_sequences``,
+    and ``ct_formation_sequences``."""
     demos = discover_demos(demo_dir)
     if verbose:
         print(f"Found {len(demos)} demo files")
@@ -995,6 +1407,7 @@ def extract_all(
     all_rl: list[pd.DataFrame] = []
     all_rl_v2: list[pd.DataFrame] = []
     all_sequences: list[dict] = []
+    all_ct_formations: list[dict] = []
 
     for idx, path in enumerate(demos):
         name = os.path.basename(path)
@@ -1028,6 +1441,12 @@ def extract_all(
                 if verbose:
                     print(f", {len(seqs)} seqs ({n_events} events)", end="")
 
+            if include_ct_formations:
+                ct_seqs = _extract_ct_formation_sequences(p, path)
+                all_ct_formations.extend(ct_seqs)
+                if verbose:
+                    print(f", {len(ct_seqs)} CT-form seqs", end="")
+
             if verbose:
                 print(" OK")
 
@@ -1043,7 +1462,8 @@ def extract_all(
     if verbose:
         print(f"\nTotal: {len(rounds_df)} rounds, {len(rl_df)} RL transitions, "
               f"{len(rl_v2_df)} RLv2 transitions, "
-              f"{len(all_sequences)} event sequences "
+              f"{len(all_sequences)} event sequences, "
+              f"{len(all_ct_formations)} CT formation sequences "
               f"from {len(demos)} demos")
 
     return {
@@ -1051,6 +1471,7 @@ def extract_all(
         "rl_transitions": rl_df,
         "rl_v2": rl_v2_df,
         "event_sequences": all_sequences,
+        "ct_formation_sequences": all_ct_formations,
     }
 
 

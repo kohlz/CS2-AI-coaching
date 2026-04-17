@@ -1,20 +1,8 @@
 """
 demo_parser.py
 
-Parse a CS2 demo file (.dem) into structured per-round match data.
-
-Usage
------
-    from demo_parser import parse_demo
-
-    match = parse_demo("path/to/demo.dem", target_player="PlayerName")
-    for r in match.rounds:
-        print(r.round_num, r.winner, r.events)
-
-The target_player parameter specifies which player's perspective the
-coaching system should analyze.  All round data is structured to make
-it easy to answer questions like "what did the target player know at
-tick T?" and "was their buy decision optimal?"
+Parse a CS2 demo file (.dem) into structured per-round match data
+organized around a target player's perspective.
 """
 
 from __future__ import annotations
@@ -32,7 +20,7 @@ from demoparser2 import DemoParser
 # Data classes
 # ---------------------------------------------------------------------------
 
-TICK_RATE = 64  # CS2 standard demo tick rate
+TICK_RATE = 64
 
 
 @dataclass
@@ -210,21 +198,14 @@ def _team_str(team_num: int | float) -> str:
 # ---------------------------------------------------------------------------
 
 def parse_demo(demo_path: str, target_player: str) -> MatchData:
-    """
-    Parse a CS2 demo file and return structured match data.
+    """Parse a CS2 demo file and return structured match data.
 
-    Parameters
-    ----------
-    demo_path : str
-        Path to the .dem file.
-    target_player : str
-        Name of the player to analyze.  Must match the in-game name
-        exactly as it appears in the demo.
+    Args:
+        demo_path: Path to the .dem file.
+        target_player: In-game name of the player to analyze.
 
-    Returns
-    -------
-    MatchData
-        Complete match data segmented into rounds.
+    Returns:
+        MatchData segmented into rounds.
     """
     parser = DemoParser(demo_path)
     header = parser.parse_header()
@@ -279,17 +260,19 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
         player=["X", "Y", "Z"],
         other=["total_rounds_played"],
     )
+    # Molotov + Incendiary both trigger inferno_startburn
+    molotovs = parser.parse_event(
+        "inferno_startburn",
+        player=["X", "Y", "Z"],
+        other=["total_rounds_played"],
+    )
 
     freeze_ends_raw = sorted(parser.parse_event("round_freeze_end")["tick"].tolist())
     round_ends_raw = sorted(set(
         parser.parse_event("round_officially_ended")["tick"].tolist()
     ))
 
-    # Pair each freeze_end with the first round_end that falls between it
-    # and the next freeze_end.  Unpaired freeze_ends (warmup, knife) are
-    # discarded so that tick ranges never overlap between rounds.
-    # The very last competitive round may lack a round_officially_ended
-    # event (match ends at 13 wins), so we use a fallback tick estimate.
+    # Pair each freeze_end with the first matching round_end.
     freeze_ends: list[int] = []
     round_ends: list[int] = []
 
@@ -304,8 +287,7 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
             freeze_ends.append(fe)
             round_ends.append(matched_re)
         elif i == len(freeze_ends_raw) - 1 and freeze_ends:
-            # Last freeze_end with no round_end — likely the match-winning
-            # round.  Estimate end as 115 seconds after freeze_end.
+            # Fallback for the match-winning round with no round_end.
             freeze_ends.append(fe)
             round_ends.append(fe + 115 * TICK_RATE)
 
@@ -359,9 +341,24 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
         players=players,
     )
 
+    # Filter out knife rounds.
+    def _is_knife_round_rd(fe: int, end: int) -> bool:
+        rd_d = deaths[(deaths["tick"] >= fe) & (deaths["tick"] <= end)]
+        if "weapon" not in rd_d.columns or len(rd_d) == 0:
+            return False
+        weapons = [str(w).lower() for w in rd_d["weapon"].tolist()]
+        weapons = [w for w in weapons if w and w != "nan"]
+        if not weapons:
+            return False
+        knife_kills = sum(1 for w in weapons if "knife" in w)
+        return knife_kills == len(weapons)
+
+    real_round_num = 0
     for i in range(n_rounds):
         fe_tick = freeze_ends[i]
         end_tick = round_ends[i]
+        if _is_knife_round_rd(fe_tick, end_tick):
+            continue
         next_fe = freeze_ends[i + 1] if i + 1 < len(freeze_ends) else end_tick
 
         # Find the buytime_ended tick for this round
@@ -372,7 +369,7 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
                 break
 
         rd = _build_round(
-            round_num=i,
+            round_num=real_round_num,
             tick_freeze_end=fe_tick,
             tick_end=end_tick,
             deaths=deaths,
@@ -383,6 +380,7 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
             smokes=smokes,
             flashes=flashes,
             he_grenades=he_grenades,
+            molotovs=molotovs,
             econ_df=econ_df,
             pos_df=pos_df,
             fe_tick=fe_tick,
@@ -390,6 +388,7 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
             bt_tick=bt_tick,
         )
         match.rounds.append(rd)
+        real_round_num += 1
 
     return match
 
@@ -410,6 +409,7 @@ def _build_round(
     smokes: pd.DataFrame,
     flashes: pd.DataFrame,
     he_grenades: pd.DataFrame,
+    molotovs: pd.DataFrame,
     econ_df: pd.DataFrame,
     pos_df: pd.DataFrame,
     fe_tick: int,
@@ -429,6 +429,7 @@ def _build_round(
     rd_smokes = _in_round(smokes)
     rd_flashes = _in_round(flashes)
     rd_hes = _in_round(he_grenades)
+    rd_molotovs = _in_round(molotovs)
 
     # ── Economy snapshot at freeze end ───────────────────────────────
     econ_snap = econ_df[econ_df["tick"] == fe_tick]
@@ -519,9 +520,7 @@ def _build_round(
         if attacker in att_pool:
             att_pool[attacker].kills += 1
 
-    # Damage totals — only count damage dealt to enemies (not team/self).
-    # Track each victim's HP across hits so that overkill damage is not
-    # counted: actual_dmg = victim_hp_before - health_after.
+    # Damage totals (enemies only, clamped to avoid overkill).
     t_names = set(t_players.keys())
     ct_names = set(ct_players.keys())
 
@@ -577,7 +576,8 @@ def _build_round(
         ))
 
     # Grenade events
-    for label, df in [("smoke", rd_smokes), ("flash", rd_flashes), ("he_grenade", rd_hes)]:
+    for label, df in [("smoke", rd_smokes), ("flash", rd_flashes),
+                       ("he_grenade", rd_hes), ("molotov", rd_molotovs)]:
         for _, row in df.iterrows():
             events.append(GameEvent(
                 tick=int(row["tick"]),

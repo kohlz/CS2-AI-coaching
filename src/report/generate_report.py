@@ -1,23 +1,9 @@
 """
 generate_report.py
 
-End-to-end coaching report generator.
-
-Workflow:
-  1. Parse a demo file for a target player
-  2. Run Economy MDP evaluation
-  3. Run NN predictions (win prob, attack site, CT formation)
-  4. Run HMM game-sense evaluation
-  5. Run Engagement analysis
-  6. Combine into a structured coaching report (dict + text)
-
-Usage
------
-    python src/report/generate_report.py <demo.dem> <player_name>
-
-    # Or from code:
-    from report.generate_report import generate_full_report
-    report = generate_full_report("demo.dem", "k_z_")
+End-to-end coaching report generator. Combines demo parsing, economy MDP,
+NN/LSTM predictions, RL suggestions, and engagement analysis into a
+structured per-player report.
 """
 
 from __future__ import annotations
@@ -32,7 +18,6 @@ from typing import Optional
 
 import numpy as np
 
-# Make sure parent packages are importable
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 sys.path.insert(0, str(PROJECT_ROOT / "src" / "demo"))
@@ -46,24 +31,34 @@ sys.path.insert(0, str(PROJECT_ROOT / "src" / "report"))
 
 from demo_parser import parse_demo, MatchData
 from callouts_mirage import get_zone
-from economy_mdp import evaluate_player_economy, economy_summary, solve_economy_mdp
+from economy_mdp import evaluate_player_economy, economy_summary
 from engagement import analyze_engagement, engagement_summary
-from info_model import EconomyHMM, predict_enemy_economy
+from info_model import predict_enemy_economy
 
-# NN / RL are optional — gracefully degrade if models not found
+try:
+    from visualize import generate_all_charts
+    _VIZ_AVAILABLE = True
+except ImportError:
+    _VIZ_AVAILABLE = False
+
 _NN_AVAILABLE = False
 _RL_AVAILABLE = False
 
 try:
-    from strategy_nn import (load_models, WinPredictor, AttackPredictor,
-                             FormationClassifier, EventSequencePredictor)
+    from strategy_nn import (
+        load_models, PreRoundFormation, PreRoundAttack,
+        FormationClassifier_T, FormationClassifier_CT,
+    )
     _NN_AVAILABLE = True
 except ImportError:
     pass
 
 try:
-    from tactical_rl import (TacticalQLearner, ACTION_NAMES,
-                             TacticalQLearnerV2, ACTION_NAMES_V2)
+    from tactical_rl import (
+        TacticalQLearner, ACTION_NAMES,
+        TacticalQLearnerV2, ACTION_NAMES_V2,
+        TacticalQLearner_T, TacticalQLearner_CT,
+    )
     _RL_AVAILABLE = True
 except ImportError:
     pass
@@ -89,27 +84,8 @@ class CoachingReport:
 
     round_details: list[dict] = field(default_factory=list)
     coaching_tips: list[str] = field(default_factory=list)
-    overall_grade: str = ""
 
     generation_time_sec: float = 0.0
-
-
-# ---------------------------------------------------------------------------
-# Grade combiner
-# ---------------------------------------------------------------------------
-
-GRADE_VALUES = {"A": 4.0, "B": 3.0, "C": 2.0, "D": 1.0, "F": 0.0}
-
-def _letter(score: float) -> str:
-    if score >= 3.5:
-        return "A"
-    if score >= 2.5:
-        return "B"
-    if score >= 1.5:
-        return "C"
-    if score >= 0.5:
-        return "D"
-    return "F"
 
 
 # ---------------------------------------------------------------------------
@@ -194,18 +170,14 @@ def _generate_tips(econ: dict, eng: dict, _gs=None) -> list[str]:
 # ---------------------------------------------------------------------------
 
 def _resolve_bomb_site(rd) -> str:
-    """Get the bomb site as 'A' or 'B' from round events.
-
-    Falls back to zone lookup from the planter's position at the plant
-    tick when ``rd.bomb_site`` stores a raw entity ID instead of 'A'/'B'.
-    """
+    """Return the bomb site as 'A' or 'B' for a round, or 'no_plant'/'unknown'."""
     if not rd.bomb_planted:
         return "no_plant"
     if rd.bomb_site in ("A", "B"):
         return rd.bomb_site
 
     TICK_RATE = 64
-    POS_STEP = 2 * TICK_RATE  # positions sampled every 2 s
+    POS_STEP = 2 * TICK_RATE
 
     for ev in rd.events:
         if ev.event_type == "bomb_plant":
@@ -227,79 +199,132 @@ def _resolve_bomb_site(rd) -> str:
     return "unknown"
 
 
-def _run_nn_predictions(match: MatchData, models: dict) -> dict:
+def _resolve_plant_site(rd) -> str:
+    """Return 'A', 'B', or 'no_plant' for a round."""
+    for ev in rd.events:
+        if ev.event_type == "bomb_plant":
+            site = _resolve_bomb_site(rd)
+            if site in ("A", "B"):
+                return site
+    return "no_plant"
+
+
+def _compute_prior_features(match: MatchData) -> dict[int, dict]:
+    """Compute prior-round tendency features for each round_num."""
+    out: dict[int, dict] = {}
+    rounds = sorted(match.rounds, key=lambda r: r.round_num)
+
+    rounds_since_A = 999
+    rounds_since_B = 999
+    streak_same = 0
+    last_site = ""
+    prev_rd = None
+
+    def _equip_tier(players) -> float:
+        if not players:
+            return 0.0
+        from callouts_mirage import get_zone  # noqa: F401
+        RIFLES = {"ak47", "m4a1_silencer", "m4a1", "m4a4", "awp", "famas",
+                  "galilar", "aug", "sg556", "scar20", "g3sg1"}
+        SMGS = {"mp9", "mac10", "ump45", "p90", "bizon", "mp7", "mp5sd"}
+        rifles = sum(1 for p in players
+                     if (p.primary_weapon or "").lower() in RIFLES)
+        smgs = sum(1 for p in players
+                   if (p.primary_weapon or "").lower() in SMGS)
+        return 2.0 if rifles >= 3 else (1.0 if rifles + smgs >= 2 else 0.0)
+
+    for rd in rounds:
+        round_in_half = rd.round_num % 12
+        is_half_start = (round_in_half == 0)
+
+        if is_half_start or prev_rd is None:
+            feats = {
+                "prev_plant_A": 0, "prev_plant_B": 0, "prev_plant_none": 0,
+                "prev_no_history": 1, "prev_t_won": 0.5,
+                "prev_t_tier": 0.0, "prev_ct_tier": 0.0,
+                "rounds_since_plant_A": 1.0, "rounds_since_plant_B": 1.0,
+                "streak_same_site": 0.0,
+            }
+            rounds_since_A = 999
+            rounds_since_B = 999
+            streak_same = 0
+            last_site = ""
+        else:
+            prev_site = _resolve_plant_site(prev_rd)
+            feats = {
+                "prev_plant_A": int(prev_site == "A"),
+                "prev_plant_B": int(prev_site == "B"),
+                "prev_plant_none": int(prev_site == "no_plant"),
+                "prev_no_history": 0,
+                "prev_t_won": 1.0 if prev_rd.winner == "T" else 0.0,
+                "prev_t_tier": _equip_tier(prev_rd.t_players) / 2.0,
+                "prev_ct_tier": _equip_tier(prev_rd.ct_players) / 2.0,
+                "rounds_since_plant_A": min(rounds_since_A, 6) / 6.0,
+                "rounds_since_plant_B": min(rounds_since_B, 6) / 6.0,
+                "streak_same_site": min(streak_same, 3) / 3.0,
+            }
+
+        out[rd.round_num] = feats
+
+        cur_site = _resolve_plant_site(rd)
+        rounds_since_A = 0 if cur_site == "A" else rounds_since_A + 1
+        rounds_since_B = 0 if cur_site == "B" else rounds_since_B + 1
+        if cur_site in ("A", "B"):
+            streak_same = streak_same + 1 if cur_site == last_site else 1
+            last_site = cur_site
+        else:
+            streak_same = 0
+        prev_rd = rd
+
+    return out
+
+
+def _run_nn_predictions(match: MatchData, models: dict,
+                        hmm_predictions: list[dict] | None = None) -> dict:
     """Run NN predictions for each round and return aggregate info."""
-    wp = models.get("win_predictor")
-    ap = models.get("attack_predictor")
-    fc = models.get("formation_classifier")
+    prf = models.get("preround_formation")
+    pra = models.get("preround_attack")
 
     predictions = {
         "available": True,
-        "win_prob_samples": [],
-        "attack_predictions": [],
         "formation_predictions": [],
+        "attack_predictions": [],
     }
+
+    hmm_by_round: dict[int, dict] = {}
+    if hmm_predictions:
+        for pred in hmm_predictions:
+            hmm_by_round[pred["round_num"]] = pred
+
+    prior_by_round = _compute_prior_features(match)
 
     for rd in match.rounds:
         p = rd.get_player(match.target_player)
         if p is None:
             continue
 
-        side = p.side
-        t_money = sum(pl.start_money for pl in rd.t_players) / max(len(rd.t_players), 1)
-        ct_money = sum(pl.start_money for pl in rd.ct_players) / max(len(rd.ct_players), 1)
-
-        t_tier = _money_to_tier(t_money)
-        ct_tier = _money_to_tier(ct_money)
-        t_streak = 0
-        ct_streak = 0
-
         round_in_half = rd.round_num % 12
+        is_second_half = 1 if rd.round_num >= 12 else 0
+        prior = prior_by_round.get(rd.round_num, {})
 
-        # Win probability
-        if wp is not None:
-            try:
-                prob = wp.predict_single(
-                    t_tier=t_tier, ct_tier=ct_tier,
-                    t_streak=t_streak, ct_streak=ct_streak,
-                    round_in_half=round_in_half,
-                    side_is_t=1 if side == "T" else 0,
-                )
-                predictions["win_prob_samples"].append({
-                    "round": rd.round_num,
-                    "p_t_win": prob,
-                    "actual_winner": rd.winner,
-                })
-            except Exception:
-                pass
+        hmm_pred = hmm_by_round.get(rd.round_num)
+        if hmm_pred:
+            tier_probs = hmm_pred.get("tier_probs", {})
+            avg_money = hmm_pred.get("predicted_avg_money", 4000)
+        else:
+            tier_probs = {"BROKE": 0.2, "LOW": 0.2, "MEDIUM": 0.2,
+                          "HIGH": 0.2, "RICH": 0.2}
+            avg_money = 4000
 
-        # Attack site prediction (T-side)
-        if ap is not None:
+        # Pre-round formation
+        if prf is not None and prf.trained:
             try:
-                probs = ap.predict_single(
-                    t_avg_money=t_money,
-                    t_loss_streak=t_streak,
+                probs = prf.predict_single(
+                    tier_probs=tier_probs,
+                    predicted_avg_money=avg_money,
                     round_in_half=round_in_half,
-                )
-                actual = _resolve_bomb_site(rd)
-                predicted = max(probs, key=probs.get)
-                predictions["attack_predictions"].append({
-                    "round": rd.round_num,
-                    "predicted": predicted,
-                    "actual": actual,
-                    "correct": predicted == actual,
-                    "probs": probs,
-                })
-            except Exception:
-                pass
-
-        # CT formation
-        if fc is not None:
-            try:
-                probs = fc.predict_single(
-                    ct_avg_money=ct_money,
-                    ct_loss_streak=ct_streak,
-                    round_in_half=round_in_half,
+                    is_second_half=is_second_half,
+                    prior=prior,
                 )
                 top_formation = max(probs, key=probs.get)
                 predictions["formation_predictions"].append({
@@ -310,46 +335,37 @@ def _run_nn_predictions(match: MatchData, models: dict) -> dict:
             except Exception:
                 pass
 
-    # Accuracy summaries
-    attacks = predictions["attack_predictions"]
-    if attacks:
-        predictions["attack_accuracy"] = (
-            sum(1 for a in attacks if a["correct"]) / len(attacks)
-        )
-
-    wins = predictions["win_prob_samples"]
-    if wins:
-        correct_side = sum(
-            1 for w in wins
-            if (w["p_t_win"] >= 0.5 and w["actual_winner"] == "T") or
-               (w["p_t_win"] < 0.5 and w["actual_winner"] == "CT")
-        )
-        predictions["win_pred_accuracy"] = correct_side / len(wins)
+        # Pre-round attack
+        if pra is not None and pra.trained:
+            try:
+                t_hmm = hmm_by_round.get(rd.round_num, {})
+                t_tier_probs = t_hmm.get("t_tier_probs", tier_probs)
+                t_avg_money = t_hmm.get("t_predicted_avg_money", avg_money)
+                a_probs = pra.predict_single(
+                    tier_probs=t_tier_probs,
+                    predicted_avg_money=t_avg_money,
+                    round_in_half=round_in_half,
+                    is_second_half=is_second_half,
+                    prior=prior,
+                )
+                top_site = max(a_probs, key=a_probs.get)
+                predictions["attack_predictions"].append({
+                    "round": rd.round_num,
+                    "predicted": top_site,
+                    "probs": a_probs,
+                })
+            except Exception:
+                pass
 
     return predictions
-
-
-def _money_to_tier(avg_money: float) -> int:
-    if avg_money < 2500:
-        return 0
-    if avg_money < 4500:
-        return 1
-    return 2
 
 
 # ---------------------------------------------------------------------------
 # Per-round suggestion templates
 # ---------------------------------------------------------------------------
-# All coaching sentence templates live here.  Edit the strings to change
-# the tone, add CS2-specific jargon, or add new conditions.
-#
-# Each template can use Python f-string variables that are filled in by
-# _suggest_for_round().  Available variables are documented next to each.
 
 TEMPLATES = {
     # ── Economy ──────────────────────────────────────────────────────
-    # {action}: actual buy name, {optimal}: optimal buy name,
-    # {money}: player money, {enemy_pred}: enemy economy prediction
     "eco_over_buy": (
         "Over-bought (did {action} at ${money}, optimal was {optimal}). "
         "Save this round to guarantee a full buy next round."),
@@ -365,7 +381,6 @@ TEMPLATES = {
         "{enemy_pred} — play default setup, use all your utility."),
 
     # ── Engagement ───────────────────────────────────────────────────
-    # {kills}: kills this round, {damage}: damage dealt
     "opening_kill": (
         "Great opening frag — first blood gives your team a huge advantage."),
     "opening_death": (
@@ -390,8 +405,6 @@ TEMPLATES = {
         "Look for opportunities to deal more damage through utility or repositioning."),
 
     # ── Game Sense (CT-side) ─────────────────────────────────────────
-    # {zone}: detected attack zone, {prob}: belief probability,
-    # {player_zone}: where the player actually was
     "gs_correct": (
         "Good game sense — you read the {zone} attack correctly "
         "({prob:.0%} belief) and were in position."),
@@ -405,7 +418,6 @@ TEMPLATES = {
         "anchor a site."),
 
     # ── NN-driven predictions ───────────────────────────────────────
-    # Win probability — always shown as context
     "nn_win_ct_favored": (
         "[NN] Round win probability: {p_win:.0%} for your side (CT favored) — "
         "you have economy/position advantage, play default and use utility."),
@@ -425,7 +437,6 @@ TEMPLATES = {
         "[NN] Round win probability: {p_win:.0%} for your side (CT favored) — "
         "consider a default to look for picks before committing to a site."),
 
-    # Attack site prediction — CT-side, compare A vs B probability
     "nn_attack_a_likely": (
         "[NN] T-side is {a_prob:.0%} likely to hit A vs {b_prob:.0%} B — "
         "consider anchoring A or having utility ready for A."),
@@ -435,7 +446,6 @@ TEMPLATES = {
     "nn_attack_split": (
         "[NN] Attack probability is split (A: {a_prob:.0%}, B: {b_prob:.0%}) — "
         "stay in your default position and wait for info."),
-    # Attack site prediction — T-side, where should you hit
     "nn_t_should_hit": (
         "[NN] CT defense looks weaker on {site} ({prob:.0%}) — "
         "focus utility and coordination for a {site} execute."),
@@ -443,7 +453,6 @@ TEMPLATES = {
         "[NN] Attack probability is roughly even (A: {a_prob:.0%}, B: {b_prob:.0%}) — "
         "stay flexible and read the round before committing to a site."),
 
-    # CT formation prediction — T-side intel
     "nn_ct_formation": (
         "[NN] CT likely running {formation} ({fmt_prob:.0%}) — "
         "{formation_advice}"),
@@ -456,9 +465,17 @@ TEMPLATES = {
         "[LSTM @ {time}s] After {n_events} events: "
         "A={a_prob:.0%}, B={b_prob:.0%} → {interpretation}"),
 
-    # ── RL v2 tactical suggestion (micro-decision) ───────────────────
+    # ── CT Formation LSTM dynamic prediction (T-side only) ─────────
+    "lstm_ct_formation": (
+        "[Formation] CT running {formation} ({confidence:.0%}) — "
+        "{formation_advice}"),
+
+    # ── RL tactical suggestion (micro-decision) ─────────────────────
     "rl_suggest": (
         "[Q-learning] {state_desc} → recommended: {rl_action}."),
+    "rl_ss_suggest": (
+        "[RL] {state_desc} → best play: {rl_action} "
+        "(kill-Q: {kill_q:+.2f}, win-Q: {win_q:+.2f})."),
     "rl_v2_suggest": (
         "[Q-learning v2] {state_desc} → best play: {rl_action} "
         "(kill-value: {kill_q:+.2f}, win-value: {win_q:+.2f})."),
@@ -516,13 +533,13 @@ def _suggest_for_round(
     rl_v2_suggestion: Optional[dict] = None,
     lstm_preds: Optional[list] = None,
     rl_timeline: Optional[list] = None,
+    ct_formation_preds: Optional[list] = None,
+    round_events: Optional[list] = None,
 ) -> dict:
     """Generate per-round coaching output with event-driven timeline.
 
-    Returns a dict with:
-      - ``pre_round``: list[str] — economy, engagement, NN round-start notes
-      - ``timeline``:  list[dict] — chronological LSTM + RL entries
-      - ``outcome``:   str        — post-round summary line
+    Returns a dict with ``pre_round`` (list[str]), ``timeline`` (list[dict]),
+    and ``outcome`` (str).
     """
     pre_round: list[str] = []
     side = rd_detail.get("side", "")
@@ -617,17 +634,23 @@ def _suggest_for_round(
                     pre_round.append(TEMPLATES["nn_win_t_underdog"].format(p_win=p_win))
 
         attack = nn_round.get("attack_pred")
-        if attack:
+        if attack and side == "CT":
             a_prob = attack.get("A", 0)
             b_prob = attack.get("B", 0)
-            total_site = a_prob + b_prob
-            if total_site > 0.01:
-                a_rel = a_prob / total_site
-                b_rel = b_prob / total_site
-            else:
-                a_rel, b_rel = 0.5, 0.5
+            no_plant = attack.get("no_plant", 0)
 
-            if side == "CT":
+            if no_plant >= 0.50 and no_plant > a_prob and no_plant > b_prob:
+                pre_round.append(
+                    f"[Pre-Round Attack] T likely to eco / no plant "
+                    f"({no_plant:.0%}) — hunt for picks, save util for next.")
+            else:
+                total_site = a_prob + b_prob
+                if total_site > 0.01:
+                    a_rel = a_prob / total_site
+                    b_rel = b_prob / total_site
+                else:
+                    a_rel, b_rel = 0.5, 0.5
+
                 if a_rel >= 0.65:
                     pre_round.append(TEMPLATES["nn_attack_a_likely"].format(
                         a_prob=a_rel, b_prob=b_rel))
@@ -636,15 +659,6 @@ def _suggest_for_round(
                         a_prob=a_rel, b_prob=b_rel))
                 else:
                     pre_round.append(TEMPLATES["nn_attack_split"].format(
-                        a_prob=a_rel, b_prob=b_rel))
-            else:
-                weaker = "A" if a_rel < b_rel else "B"
-                weaker_prob = min(a_rel, b_rel)
-                if abs(a_rel - b_rel) >= 0.20:
-                    pre_round.append(TEMPLATES["nn_t_should_hit"].format(
-                        site=weaker, prob=weaker_prob))
-                else:
-                    pre_round.append(TEMPLATES["nn_t_split"].format(
                         a_prob=a_rel, b_prob=b_rel))
 
         formation = nn_round.get("formation_pred")
@@ -710,6 +724,60 @@ def _suggest_for_round(
                              f"— {entry['action']} [{entry.get('state_desc', '')}]"),
                 })
 
+    if ct_formation_preds and side == "T":
+        _CT_ADVICE = {
+            "2-1-2": "balanced — mid control is key before committing",
+            "1-2-2": "B/mid stacked — A might be weak",
+            "2-2-1": "A/mid stacked — B might be weak",
+            "3-1-1": "A heavily stacked — hit B or mid-to-B",
+            "1-1-3": "B heavily stacked — hit A",
+            "1-1-1": "spread thin — fast execute can overwhelm",
+            "2-1-1": "A favored — consider B",
+            "1-1-2": "B favored — consider A",
+        }
+        for fp in ct_formation_preds:
+            fmt = fp.get("formation", "unknown")
+            conf = fp.get("confidence", 0)
+            advice = _CT_ADVICE.get(fmt, "adapt based on what you see")
+            timeline.append({
+                "time_sec": fp.get("time_sec", 0),
+                "tick": fp.get("tick", 0),
+                "source": "Formation",
+                "trigger": fp.get("trigger_desc", ""),
+                "text": f"CT running {fmt} ({conf:.0%}) — {advice}",
+            })
+
+    # Surface enemy utility events as trigger-only rows
+    enemy_side = "T" if side == "CT" else "CT"
+    util_types = {1, 2, 3, 5}
+    if round_events:
+        for ev in round_events:
+            if ev.get("type_idx") not in util_types:
+                continue
+            if ev.get("_thrower_side") != enemy_side:
+                continue
+            timeline.append({
+                "time_sec": ev.get("_time_sec", 0),
+                "tick": ev.get("_tick", 0),
+                "source": "Util",
+                "trigger": ev.get("_desc", ""),
+                "text": "",
+            })
+
+    # Scrub trigger descriptions that name own-side utility
+    if round_events:
+        own_util_keys = {
+            (round(ev.get("_time_sec", 0), 1), ev.get("_desc", ""))
+            for ev in round_events
+            if ev.get("type_idx") in util_types
+            and ev.get("_thrower_side") == side
+        }
+        for entry in timeline:
+            key = (round(entry.get("time_sec", 0), 1),
+                   entry.get("trigger", ""))
+            if key in own_util_keys:
+                entry["trigger"] = ""
+
     timeline.sort(key=lambda e: (e["time_sec"], e["tick"]))
 
     # ── Outcome line ─────────────────────────────────────────────────
@@ -739,8 +807,6 @@ def _suggest_for_round(
 
 ZONE_TO_IDX = {"A": 0, "B": 1, "MID": 2, "CT_BASE": 3, "T_BASE": 4}
 
-# Side-aware and phase-aware RL action interpretation.
-# Keys: (side, bomb_planted) → dict of raw_action → human-readable advice.
 _RL_LABELS = {
     ("CT", False): {
         "ROTATE_A": "Rotate towards A — info suggests pressure there",
@@ -794,11 +860,7 @@ def _interpret_rl_action(raw_action: str, side: str,
 
 
 def _get_rl_suggestion(rd, target_player: str, q_learner) -> Optional[dict]:
-    """Get Q-learning recommendations for the player at a key round moment.
-
-    Uses a mid-round snapshot so alive counts and zone reflect the state
-    at the time the player would actually need to make a tactical decision.
-    """
+    """Get Q-learning recommendations for the player at a mid-round snapshot."""
     p = rd.get_player(target_player)
     if p is None or q_learner is None:
         return None
@@ -853,7 +915,6 @@ def _get_rl_suggestion(rd, target_player: str, q_learner) -> Optional[dict]:
             player_zone = z
     zone_idx = ZONE_TO_IDX.get(player_zone, 2)
 
-    # Player's teammates alive (from their perspective)
     if side == "CT":
         my_alive, enemy_alive = ct_alive, t_alive
     else:
@@ -937,7 +998,6 @@ def _get_rl_v2_suggestion(rd, target_player: str, q_v2) -> Optional[dict]:
             player_zone = z
     zone_idx = ZONE_TO_IDX.get(player_zone, 2)
 
-    # Determine recent event from round events near decision_tick
     recent = 0
     lookback = 5 * 64
     for ev in reversed(rd.events):
@@ -970,7 +1030,6 @@ def _get_rl_v2_suggestion(rd, target_player: str, q_v2) -> Optional[dict]:
         raw_action = ACTION_NAMES_V2[best]
         best_detail = detail[raw_action]
 
-        # Side-aware labels for v2 actions
         v2_labels = {
             ("CT", False): {
                 "PEEK": "Push for info or an aggressive peek",
@@ -1070,8 +1129,7 @@ _V2_LABELS = {
 
 
 def _get_rl_v2_timeline(rd, target_player: str, q_v2, events=None) -> list[dict]:
-    """Query Q-learning v2 at every event tick; only emit when the
-    recommended action changes from the previous suggestion."""
+    """Query Q-learning v2 at every event tick; emit only when the action changes."""
     p = rd.get_player(target_player)
     if p is None or q_v2 is None:
         return []
@@ -1146,13 +1204,13 @@ def _get_rl_v2_timeline(rd, target_player: str, q_v2, events=None) -> list[dict]
         if recent_type == 0:
             victim = ev.get("_victim", "")
             if victim in (t_names if side == "T" else ct_names):
-                recent = 1  # teammate died
+                recent = 1
             else:
-                recent = 2  # enemy killed
+                recent = 2
         elif recent_type in (1, 2, 3):
-            recent = 3  # grenade
+            recent = 3
         elif recent_type == 4:
-            recent = 4  # bomb plant
+            recent = 4
         else:
             recent = 0
 
@@ -1192,14 +1250,253 @@ def _get_rl_v2_timeline(rd, target_player: str, q_v2, events=None) -> list[dict]
     return timeline
 
 
+# ── Side-specific RL event-driven timeline ────────────────────────────
+
+_SS_LABELS = {
+    ("CT", False): {
+        "HOLD": "Hold your position and wait for contact",
+        "ROTATE": "Rotate toward the active site",
+        "RETAKE": "Set up for a retake",
+        "PUSH": "Push for info or an aggressive peek",
+        "FALL_BACK": "Fall back to a safer crossfire angle",
+        "UTILITY": "Use utility (flash/smoke) to control space",
+    },
+    ("CT", True): {
+        "HOLD": "Wait for teammates to group for retake",
+        "ROTATE": "Rotate to the bomb site",
+        "RETAKE": "Group for retake — push with utility",
+        "PUSH": "Peek aggressively for the retake",
+        "FALL_BACK": "Save your weapon for next round",
+        "UTILITY": "Smoke/flash the site for retake",
+    },
+    ("T", False): {
+        "EXECUTE": "Execute onto the site — go now",
+        "PEEK": "Take an aggressive entry peek",
+        "TRADE": "Follow up on teammate's contact for a trade",
+        "FALL_BACK": "Pull back and regroup",
+        "UTILITY": "Use utility before committing to a site",
+        "LURK": "Lurk and play for a late-round pick",
+    },
+    ("T", True): {
+        "EXECUTE": "Push to secure post-plant control",
+        "PEEK": "Take an off-angle to catch retaking CTs",
+        "TRADE": "Push to trade — time is on your side",
+        "FALL_BACK": "Play safe in cover, let the timer work",
+        "UTILITY": "Delay the retake with utility",
+        "LURK": "Lurk and watch the flank",
+    },
+}
+
+
+def _get_ss_rl_timeline(rd, target_player: str, ql_model,
+                        events=None) -> list[dict]:
+    """Query side-specific Q-learner at every event tick; emit only when the action changes."""
+    p = rd.get_player(target_player)
+    if p is None or ql_model is None or not ql_model.trained:
+        return []
+
+    if events is None:
+        events = _build_round_events(rd)
+    if not events:
+        return []
+
+    side = p.side
+    t_names = {pl.name for pl in rd.t_players}
+    ct_names = {pl.name for pl in rd.ct_players}
+
+    def _alive_at(players, tick):
+        return sum(1 for pl in players
+                   if pl.death_tick is None or pl.death_tick > tick)
+
+    def _team_support_at(rd, target_player, side, tick, pos_step=2*64,
+                         freeze_end=0):
+        my_zone = None
+        p = rd.get_player(target_player)
+        if p and p.positions:
+            idx = round((tick - freeze_end) / pos_step)
+            idx = max(0, min(idx, len(p.positions) - 1))
+            my_zone = get_zone(p.positions[idx].x, p.positions[idx].y)
+
+        teammates = rd.ct_players if side == "CT" else rd.t_players
+        nearby = 0
+        for tm in teammates:
+            if tm.name == target_player:
+                continue
+            if tm.death_tick is not None and tm.death_tick <= tick:
+                continue
+            if tm.positions:
+                ti = round((tick - freeze_end) / pos_step)
+                ti = max(0, min(ti, len(tm.positions) - 1))
+                tz = get_zone(tm.positions[ti].x, tm.positions[ti].y)
+                if tz == my_zone:
+                    nearby += 1
+        return min(nearby, 2)
+
+    player_dead = False
+    prev_action = None
+    timeline = []
+    bomb_planted = False
+    bomb_site = ""
+
+    for ev in events:
+        tick = ev.get("_tick", 0)
+        time_sec = ev.get("_time_sec", 0)
+        desc = ev.get("_desc", "")
+
+        if ev.get("_victim") == target_player:
+            player_dead = True
+            timeline.append({
+                "time_sec": time_sec, "tick": tick,
+                "trigger_desc": desc, "type": "player_death",
+                "note": "You died — round over for you",
+            })
+            break
+
+        if ev.get("type_idx") == 4:
+            bomb_planted = True
+            bs = _resolve_bomb_site(rd)
+            bomb_site = bs if bs in ("A", "B") else ""
+
+        t_alive = max(_alive_at(rd.t_players, tick), 1)
+        ct_alive = max(_alive_at(rd.ct_players, tick), 1)
+        my_alive = t_alive if side == "T" else ct_alive
+        enemy_alive = ct_alive if side == "T" else t_alive
+        alive_adv = max(-3, min(3, my_alive - enemy_alive))
+
+        bomb_status = 0
+        if bomb_planted:
+            bomb_status = 1 if bomb_site == "A" else 2 if bomb_site == "B" else 0
+
+        elapsed = time_sec
+        time_bucket = (3 if bomb_status > 0 else
+                       0 if elapsed <= 30 else
+                       1 if elapsed <= 60 else 2)
+
+        player_zone = "MID"
+        if p.positions:
+            pos_step = 2 * 64
+            idx = round((tick - rd.tick_freeze_end) / pos_step)
+            idx = max(0, min(idx, len(p.positions) - 1))
+            z = get_zone(p.positions[idx].x, p.positions[idx].y)
+            if z in ZONE_TO_IDX:
+                player_zone = z
+        zone_idx = ZONE_TO_IDX.get(player_zone, 2)
+
+        recent_type = ev.get("type_idx", 0)
+        if recent_type == 0:
+            victim = ev.get("_victim", "")
+            if victim in (t_names if side == "T" else ct_names):
+                recent = 1
+            else:
+                recent = 2
+        elif recent_type in (1, 2, 3):
+            recent = 3
+        elif recent_type == 4:
+            recent = 4
+        else:
+            recent = 0
+
+        team_support = _team_support_at(
+            rd, target_player, side, tick,
+            freeze_end=rd.tick_freeze_end)
+
+        try:
+            best, blended, detail = ql_model.recommend(
+                alive_adv, bomb_status, time_bucket, zone_idx, recent,
+                team_support)
+            raw_action = ql_model.action_names[best]
+        except Exception:
+            continue
+
+        if raw_action == prev_action:
+            continue
+
+        prev_action = raw_action
+        labels = _SS_LABELS.get((side, bomb_planted), _SS_LABELS[("CT", False)])
+        action_text = labels.get(raw_action, raw_action)
+
+        best_detail = detail.get(raw_action, {})
+        blend_val = best_detail.get("blend", 0)
+
+        phase = "post-plant" if bomb_planted else (
+            "early" if time_bucket == 0 else
+            "mid-round" if time_bucket == 1 else "late")
+
+        timeline.append({
+            "time_sec": time_sec, "tick": tick,
+            "trigger_desc": desc, "type": "rl_suggestion",
+            "raw_action": raw_action, "action": action_text,
+            "blend": blend_val,
+            "state_desc": (f"{phase}, {my_alive}v{enemy_alive}, "
+                           f"you at {player_zone}"),
+        })
+
+    return timeline
+
+
+# ── CT formation LSTM predictions (for T-side rounds) ────────────────
+
+def _get_ct_formation_predictions(rd, fc_ct_model, events=None,
+                                  prior: list[float] | None = None) -> list[dict]:
+    """Run FormationClassifier_CT at event checkpoints; emit on delta.
+
+    ``prior`` is the pre-round formation distribution used to seed the LSTM.
+    """
+    if fc_ct_model is None or not fc_ct_model.trained:
+        return []
+
+    if events is None:
+        events = _build_round_events(rd)
+    if len(events) < 2:
+        return []
+
+    def _alive_at(players, tick):
+        return sum(1 for pl in players
+                   if pl.death_tick is None or pl.death_tick > tick)
+
+    DELTA_THRESHOLD = 0.10
+    results = []
+    prev_formation = ""
+
+    for i in range(1, len(events) + 1):
+        sub_events = events[:i]
+        clean = [{k: v for k, v in e.items() if not k.startswith("_")}
+                 for e in sub_events]
+        ct_alive_list = []
+        for e in sub_events:
+            tick = e.get("_tick", 0)
+            ca = max(_alive_at(rd.ct_players, tick), 1)
+            ct_alive_list.append(ca)
+
+        pred = fc_ct_model.predict_readable(clean, ct_alive_list,
+                                            prior=prior)
+        formation = pred.get("formation", "unknown")
+        confidence = pred.get("confidence", 0)
+
+        if formation != prev_formation or i == len(events):
+            trigger = events[i - 1]
+            results.append({
+                "n_events": i,
+                "time_sec": trigger.get("_time_sec", 0),
+                "tick": trigger.get("_tick", 0),
+                "formation": formation,
+                "confidence": confidence,
+                "ct_alive": pred.get("ct_alive", 5),
+                "trigger_desc": trigger.get("_desc", ""),
+            })
+            prev_formation = formation
+
+    return results
+
+
 _ZONE_IDX_MAP = {"A": 0, "B": 1, "MID": 2, "CT_BASE": 3, "T_BASE": 4}
 _IDX_ZONE_MAP = {v: k for k, v in _ZONE_IDX_MAP.items()}
-_UTIL_NAMES = {"smoke": "smoke", "flash": "flash", "he_grenade": "HE"}
+_UTIL_NAMES = {"smoke": "smoke", "flash": "flash", "he_grenade": "HE",
+               "molotov": "molotov"}
 
 
 def _build_round_events(rd) -> list[dict]:
-    """Extract all significant events from a round with LSTM-compatible
-    encoding AND a human-readable description for the timeline."""
+    """Extract significant events with LSTM-compatible encoding and a readable description."""
     t_names = {p.name for p in rd.t_players}
     ct_names = {p.name for p in rd.ct_players}
     events = []
@@ -1231,14 +1528,14 @@ def _build_round_events(rd) -> list[dict]:
                 "_attacker": attacker,
             })
 
-        elif ev.event_type in ("smoke", "flash", "he_grenade"):
+        elif ev.event_type in ("smoke", "flash", "he_grenade", "molotov"):
             thrower = ev.data.get("thrower", "")
             thrower_side = "T" if thrower in t_names else "CT" if thrower in ct_names else "?"
             thrower_is_t = 1 if thrower_side == "T" else 0
             gx, gy = ev.data.get("x", 0), ev.data.get("y", 0)
             zone_str = get_zone(gx, gy) if gx else "MID"
             zone_clean = zone_str if zone_str in _ZONE_IDX_MAP else "MID"
-            type_map = {"smoke": 1, "flash": 2, "he_grenade": 3}
+            type_map = {"smoke": 1, "flash": 2, "he_grenade": 3, "molotov": 5}
             util_name = _UTIL_NAMES.get(ev.event_type, ev.event_type)
             desc = f"{thrower_side} {util_name} @ {zone_clean}"
             events.append({
@@ -1250,6 +1547,8 @@ def _build_round_events(rd) -> list[dict]:
                 "_time_sec": ev.time_in_round or 0,
                 "_tick": ev.tick,
                 "_desc": desc,
+                "_thrower_side": thrower_side,
+                "_util_name": util_name,
             })
 
         elif ev.event_type == "bomb_plant":
@@ -1271,11 +1570,7 @@ def _build_round_events(rd) -> list[dict]:
 
 
 def _get_lstm_predictions(rd, lstm_model, events=None) -> list[dict]:
-    """Run LSTM predictions after every significant event with delta filtering.
-
-    Only emits a prediction when any site probability shifts by > 10%
-    from the previous emitted prediction.
-    """
+    """Run LSTM predictions after every significant event with delta filtering."""
     if lstm_model is None or not lstm_model.trained:
         return []
 
@@ -1320,6 +1615,9 @@ def _build_round_details(
     q_learner=None,
     q_v2=None,
     lstm_model=None,
+    ql_t=None,
+    ql_ct=None,
+    fc_ct_model=None,
 ) -> list[dict]:
     """Combine per-round info from all modules into unified round details."""
     econ_by_round = {e.round_num: e for e in econ_evals}
@@ -1327,12 +1625,10 @@ def _build_round_details(
 
     nn_by_round: dict[int, dict] = {}
     if nn_preds and nn_preds.get("available"):
-        for w in nn_preds.get("win_prob_samples", []):
-            nn_by_round.setdefault(w["round"], {})["win_prob"] = w["p_t_win"]
-        for a in nn_preds.get("attack_predictions", []):
-            nn_by_round.setdefault(a["round"], {})["attack_pred"] = a["probs"]
         for f in nn_preds.get("formation_predictions", []):
             nn_by_round.setdefault(f["round"], {})["formation_pred"] = f["probs"]
+        for a in nn_preds.get("attack_predictions", []):
+            nn_by_round.setdefault(a["round"], {})["attack_pred"] = a["probs"]
 
     details = []
     for rd in match.rounds:
@@ -1352,7 +1648,7 @@ def _build_round_details(
 
         ec = econ_by_round.get(rd.round_num)
         if ec:
-            entry["economy"] = {
+            econ_detail = {
                 "money": ec.money,
                 "action": ec.actual_name,
                 "optimal": ec.optimal_name,
@@ -1364,6 +1660,20 @@ def _build_round_details(
                 "team_avg_money": ec.team_avg_money,
                 "is_drop": ec.is_drop_or_pickup,
             }
+            if ec.posthoc:
+                econ_detail["posthoc"] = {
+                    "weapon_tier": ec.posthoc.weapon_tier,
+                    "weapon_appropriate": ec.posthoc.weapon_appropriate,
+                    "utility_level": ec.posthoc.utility_level,
+                    "utility_sufficient": ec.posthoc.utility_sufficient,
+                    "has_armor": ec.posthoc.has_armor,
+                    "has_helmet": ec.posthoc.has_helmet,
+                    "has_kit": ec.posthoc.has_kit,
+                    "kit_note": ec.posthoc.kit_note,
+                    "waste": ec.posthoc.waste,
+                    "waste_note": ec.posthoc.waste_note,
+                }
+            entry["economy"] = econ_detail
 
         en = eng_by_round.get(rd.round_num)
         if en:
@@ -1378,27 +1688,67 @@ def _build_round_details(
 
         nn_round = nn_by_round.get(rd.round_num)
 
-        # Build round events once, share between LSTM and RL
         round_events = _build_round_events(rd)
 
-        lstm_preds = _get_lstm_predictions(rd, lstm_model, events=round_events)
+        # Enforce round termination: filter past team elimination or player death
+        filtered_events = []
+        for ev in round_events:
+            filtered_events.append(ev)
+            if ev.get("type_idx") == 0:
+                tick = ev.get("_tick", 0)
+                def _alive_at_tick(players, t):
+                    return sum(1 for pl in players
+                               if pl.death_tick is None or pl.death_tick > t)
+                ta = _alive_at_tick(rd.t_players, tick)
+                ca = _alive_at_tick(rd.ct_players, tick)
+                if ta == 0 or ca == 0:
+                    break
+                if ev.get("_victim") == match.target_player:
+                    break
+        round_events = filtered_events
 
-        rl_tl = _get_rl_v2_timeline(
-            rd, match.target_player, q_v2, events=round_events) if q_v2 else []
+        # Side-aware model routing
+        lstm_preds = []
+        if p.side == "CT" and lstm_model is not None:
+            lstm_preds = _get_lstm_predictions(
+                rd, lstm_model, events=round_events)
 
-        # Legacy v1 fallback (used only if v2 timeline is empty)
+        ct_fmt_preds = None
+        if p.side == "T" and fc_ct_model is not None:
+            from strategy_nn import FORMATION_CLASSES
+            nn_round_data = nn_by_round.get(rd.round_num, {})
+            fmt_pred = nn_round_data.get("formation_pred")
+            ct_prior = None
+            if fmt_pred:
+                ct_prior = [fmt_pred.get(c, 0.0) for c in FORMATION_CLASSES]
+            ct_fmt_preds = _get_ct_formation_predictions(
+                rd, fc_ct_model, events=round_events, prior=ct_prior)
+
+        # RL timeline: prefer side-specific, fall back to V2, then V1
+        rl_tl = []
         rl_suggestion = None
         rl_v2_suggestion = None
+
+        side_ql = ql_t if p.side == "T" else ql_ct
+        if side_ql is not None and side_ql.trained:
+            rl_tl = _get_ss_rl_timeline(
+                rd, match.target_player, side_ql, events=round_events)
+        elif q_v2 is not None:
+            rl_tl = _get_rl_v2_timeline(
+                rd, match.target_player, q_v2, events=round_events)
+
         if not rl_tl:
-            rl_v2_suggestion = _get_rl_v2_suggestion(
-                rd, match.target_player, q_v2) if q_v2 else None
+            if q_v2 is not None:
+                rl_v2_suggestion = _get_rl_v2_suggestion(
+                    rd, match.target_player, q_v2)
             if rl_v2_suggestion is None:
                 rl_suggestion = _get_rl_suggestion(
                     rd, match.target_player, q_learner)
 
         entry["suggestions"] = _suggest_for_round(
             entry, ec, en, None, nn_round, rl_suggestion,
-            rl_v2_suggestion, lstm_preds, rl_tl)
+            rl_v2_suggestion, lstm_preds, rl_tl, ct_fmt_preds,
+            round_events=round_events)
 
         details.append(entry)
 
@@ -1416,41 +1766,32 @@ def generate_full_report(
 ) -> CoachingReport:
     """Generate a complete coaching report for one demo file.
 
-    Parameters
-    ----------
-    demo_path : str
-        Path to a .dem file.
-    target_player : str
-        Exact in-game name.
-    models_dir : str
-        Directory containing saved NN weights and Q-table.
+    Args:
+        demo_path: Path to a .dem file.
+        target_player: Exact in-game name.
+        models_dir: Directory containing saved NN weights and Q-table.
     """
     t0 = time.time()
 
-    # 1. Parse demo
     print(f"[1/5] Parsing demo: {demo_path}")
     match = parse_demo(demo_path, target_player)
     print(f"       Map: {match.map_name}, Rounds: {len(match.rounds)}, "
           f"Score: T {match.t_score} - {match.ct_score} CT")
 
-    # 2. Economy HMM + MDP
     print("[2/5] Running economy analysis (HMM + MDP)...")
     hmm_preds = predict_enemy_economy(match.rounds, target_player)
     print(f"       Economy HMM: {len(hmm_preds)} rounds predicted")
     econ_evals = evaluate_player_economy(match.rounds, target_player, hmm_preds)
     econ_sum = economy_summary(econ_evals)
-    print(f"       Economy grade: {econ_sum.get('grade', '?')} "
-          f"({econ_sum.get('overall_accuracy', 0):.0%} optimal)")
+    print(f"       Economy accuracy: "
+          f"{econ_sum.get('overall_accuracy', 0):.0%} optimal")
 
-    # 3. Engagement analysis
     print("[3/5] Running engagement analysis...")
     eng_evals = analyze_engagement(match.rounds, target_player)
     eng_sum = engagement_summary(eng_evals)
     print(f"       K/D: {eng_sum.get('kd_ratio', 0):.2f}, "
-          f"ADR: {eng_sum.get('adr', 0):.0f}, "
-          f"Grade: {eng_sum.get('grade', '?')}")
+          f"ADR: {eng_sum.get('adr', 0):.0f}")
 
-    # 4. NN models + LSTM
     print("[4/5] Loading NN/LSTM models...")
     nn_preds = {"available": False}
     models = {}
@@ -1459,60 +1800,64 @@ def generate_full_report(
         try:
             models = load_models(models_dir)
             print("       NN models loaded — running predictions...")
-            nn_preds = _run_nn_predictions(match, models)
+            nn_preds = _run_nn_predictions(match, models, hmm_preds)
         except Exception as e:
             print(f"       NN models not available: {e}")
 
-    # 4b. Load Q-learners (v1 fallback + v2 preferred)
+    # Load Q-learners (side-specific preferred, v2 fallback, v1 last)
     q_learner = None
     q_v2 = None
+    ql_t = None
+    ql_ct = None
     if _RL_AVAILABLE:
         try:
-            q2_path = os.path.join(models_dir, "tactical_ql_v2.npz")
-            if os.path.exists(q2_path):
-                q2 = TacticalQLearnerV2()
-                q2.load(q2_path)
-                q_v2 = q2
-                print("       Q-learner v2 loaded (dual reward: kill + win).")
+            t_path = os.path.join(models_dir, "tactical_ql_t.npz")
+            ct_path = os.path.join(models_dir, "tactical_ql_ct.npz")
+            if os.path.exists(t_path) and os.path.exists(ct_path):
+                ql_t = TacticalQLearner_T()
+                ql_t.load(t_path)
+                ql_ct = TacticalQLearner_CT()
+                ql_ct.load(ct_path)
+                print("       Side-specific Q-learners loaded (T + CT).")
             else:
-                ql = TacticalQLearner()
-                q1_path = os.path.join(models_dir, "tactical_ql.npz")
-                if os.path.exists(q1_path):
-                    ql.load(q1_path)
-                    q_learner = ql
-                    print("       Q-learner v1 loaded (fallback).")
+                q2_path = os.path.join(models_dir, "tactical_ql_v2.npz")
+                if os.path.exists(q2_path):
+                    q2 = TacticalQLearnerV2()
+                    q2.load(q2_path)
+                    q_v2 = q2
+                    print("       Q-learner v2 loaded (dual reward: kill + win).")
                 else:
-                    print("       No Q-table found, skipping RL suggestions.")
+                    ql = TacticalQLearner()
+                    q1_path = os.path.join(models_dir, "tactical_ql.npz")
+                    if os.path.exists(q1_path):
+                        ql.load(q1_path)
+                        q_learner = ql
+                        print("       Q-learner v1 loaded (fallback).")
+                    else:
+                        print("       No Q-table found, skipping RL suggestions.")
         except Exception as e:
             print(f"       Q-learner not available: {e}")
 
-    # 4c. Get LSTM model reference
-    lstm_model = models.get("event_sequence_predictor") if _NN_AVAILABLE else None
+    lstm_model = models.get("formation_classifier_t") if _NN_AVAILABLE else None
+    if lstm_model is None:
+        lstm_model = models.get("event_sequence_predictor") if _NN_AVAILABLE else None
     if lstm_model and lstm_model.trained:
-        print("       LSTM event predictor loaded — will show dynamic predictions.")
+        print("       FormationClassifier_T (LSTM) loaded.")
     else:
         lstm_model = None
 
-    # 5. Build round details and tips
+    fc_ct_model = models.get("formation_classifier_ct") if _NN_AVAILABLE else None
+    if fc_ct_model and fc_ct_model.trained:
+        print("       FormationClassifier_CT (LSTM, alive-aware) loaded.")
+    else:
+        fc_ct_model = None
+
     print("[5/5] Generating coaching tips...")
     round_details = _build_round_details(
         match, econ_evals, eng_evals, nn_preds,
-        q_learner, q_v2, lstm_model)
+        q_learner, q_v2, lstm_model,
+        ql_t=ql_t, ql_ct=ql_ct, fc_ct_model=fc_ct_model)
     tips = _generate_tips(econ_sum, eng_sum, None)
-
-    # Overall grade: weighted combination (Economy 40%, Engagement 60%)
-    grades = []
-    if "grade" in econ_sum:
-        grades.append(("Economy", GRADE_VALUES.get(econ_sum["grade"], 2.0), 0.40))
-    if "grade" in eng_sum:
-        grades.append(("Engagement", GRADE_VALUES.get(eng_sum["grade"], 2.0), 0.60))
-
-    if grades:
-        total_w = sum(w for _, _, w in grades)
-        weighted = sum(s * w for _, s, w in grades) / total_w
-        overall = _letter(weighted)
-    else:
-        overall = "?"
 
     elapsed = time.time() - t0
 
@@ -1528,7 +1873,6 @@ def generate_full_report(
         nn_predictions=nn_preds,
         round_details=round_details,
         coaching_tips=tips,
-        overall_grade=overall,
         generation_time_sec=round(elapsed, 2),
     )
 
@@ -1551,14 +1895,12 @@ def print_report(report: CoachingReport) -> None:
     print(f"  Map:      {report.map_name}")
     print(f"  Score:    {report.match_score}")
     print(f"  Rounds:   {report.total_rounds}")
-    print(f"  Overall:  {report.overall_grade}")
     print(f"  Generated in {report.generation_time_sec:.1f}s")
     print("=" * 70)
 
-    # --- Economy ---
     ec = report.economy
     if ec:
-        print(f"\n--- Economy (Grade: {ec.get('grade', '?')}) ---")
+        print(f"\n--- Economy ---")
         print(f"  Buy accuracy:      {ec.get('overall_accuracy', 0):.0%} "
               f"({ec.get('optimal_decisions', 0)}/{ec.get('total_rounds', 0)} optimal)")
         print(f"  Fresh-buy accuracy:{ec.get('fresh_buy_accuracy', 0):.0%}")
@@ -1567,10 +1909,9 @@ def print_report(report: CoachingReport) -> None:
         print(f"  Mistakes vs eco:   {ec.get('mistakes_vs_enemy_eco', 0)}")
         print(f"  Avg WP lost/mistake: {ec.get('avg_wp_loss_per_mistake', 0):.1%}")
 
-    # --- Engagement ---
     en = report.engagement
     if en:
-        print(f"\n--- Engagement (Grade: {en.get('grade', '?')}) ---")
+        print(f"\n--- Engagement ---")
         print(f"  K/D:               {en.get('kd_ratio', 0):.2f} "
               f"({en.get('kills', 0)}K / {en.get('deaths', 0)}D)")
         print(f"  ADR:               {en.get('adr', 0):.0f}")
@@ -1589,7 +1930,6 @@ def print_report(report: CoachingReport) -> None:
               f"{en.get('clutches_attempted', 0)}")
         print(f"  Util/rifle round:  {en.get('avg_util_on_rifle_round', 0):.1f}")
 
-    # --- NN Predictions ---
     nn = report.nn_predictions
     if nn.get("available"):
         print(f"\n--- Neural Network Predictions ---")
@@ -1603,14 +1943,12 @@ def print_report(report: CoachingReport) -> None:
         if formations:
             print(f"  Formation predictions:      {len(formations)} rounds analyzed")
 
-    # --- Coaching Tips ---
     print(f"\n{'='*70}")
     print("  COACHING TIPS")
     print(f"{'='*70}")
     for i, tip in enumerate(report.coaching_tips, 1):
         print(f"  {i}. {tip}")
 
-    # --- Round-by-round breakdown ---
     print(f"\n{'='*70}")
     print("  ROUND-BY-ROUND BREAKDOWN")
     print(f"{'='*70}")
@@ -1619,7 +1957,6 @@ def print_report(report: CoachingReport) -> None:
         print(f"\n  R{rd['round']:2d} [{rd['side']}] {w}  "
               f"K:{rd['kills']} D:{rd['deaths']} DMG:{rd['damage']:3d}")
 
-        # Highlights (notable events)
         en_info = rd.get("engagement", {})
         highlights = list(en_info.get("notes", []))
 
@@ -1640,26 +1977,43 @@ def print_report(report: CoachingReport) -> None:
             for s in sugg:
                 print(f"    -> {s}")
         elif isinstance(sugg, dict):
-            for s in sugg.get("pre_round", []):
-                print(f"    -> {s}")
+            pre = sugg.get("pre_round", [])
+            if pre:
+                print("    ── Pre-Round (Economy + Formation) ──")
+                for s in pre:
+                    print(f"      -> {s}")
 
             tl = sugg.get("timeline", [])
             if tl:
-                print("    ── Event Timeline ──")
+                print("    ── Event Timeline (LSTM + RL) ──")
+                # Group entries sharing the same trigger under one header
+                groups: list[dict] = []
                 for ev in tl:
-                    t = ev.get("time_sec", 0)
-                    src = ev.get("source", "")
-                    trigger = ev.get("trigger", "")
-                    text = ev.get("text", "")
-                    line = f"    [{t:5.1f}s]"
-                    if trigger:
-                        line += f" {trigger}"
-                    line += f"  [{src}] {text}"
-                    print(line)
+                    t = round(ev.get("time_sec", 0), 1)
+                    trig = ev.get("trigger", "") or ""
+                    key = (t, trig)
+                    if groups and groups[-1]["key"] == key:
+                        groups[-1]["entries"].append(ev)
+                    else:
+                        groups.append({"key": key, "entries": [ev]})
+
+                for g in groups:
+                    t, trig = g["key"]
+                    header = f"    [{t:5.1f}s]"
+                    if trig:
+                        header += f" {trig}"
+                    print(header)
+                    for ev in g["entries"]:
+                        src = ev.get("source", "")
+                        text = ev.get("text", "")
+                        if src == "Util" and not text:
+                            continue
+                        print(f"        [{src}] {text}")
 
             outcome = sugg.get("outcome", "")
             if outcome:
-                print(f"    >> {outcome}")
+                print("    ── Outcome ──")
+                print(f"      >> {outcome}")
 
     print()
 
@@ -1668,8 +2022,8 @@ def print_report(report: CoachingReport) -> None:
 # Save report to JSON
 # ---------------------------------------------------------------------------
 
-def save_report_json(report: CoachingReport, output_path: str) -> None:
-    """Save the report as a JSON file."""
+def save_report_json(report: CoachingReport, output_path: str) -> dict:
+    """Save the report as a JSON file and return the serialized dict."""
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
 
     data = {
@@ -1678,7 +2032,6 @@ def save_report_json(report: CoachingReport, output_path: str) -> None:
         "map_name": report.map_name,
         "match_score": report.match_score,
         "total_rounds": report.total_rounds,
-        "overall_grade": report.overall_grade,
         "generation_time_sec": report.generation_time_sec,
         "economy": report.economy,
         "engagement": report.engagement,
@@ -1694,6 +2047,37 @@ def save_report_json(report: CoachingReport, output_path: str) -> None:
     with open(output_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, default=str)
     print(f"Report saved to {output_path}")
+    return data
+
+
+def generate_report_charts(report: CoachingReport,
+                           output_dir: str,
+                           models_dir: str = "models") -> list[str]:
+    """Generate accuracy + fun-fact charts alongside the JSON report."""
+    if not _VIZ_AVAILABLE:
+        print("  visualize module not available — skipping charts")
+        return []
+
+    data = {
+        "demo_file": report.demo_file,
+        "player_name": report.player_name,
+        "map_name": report.map_name,
+        "match_score": report.match_score,
+        "total_rounds": report.total_rounds,
+        "economy": report.economy,
+        "engagement": report.engagement,
+        "game_sense": report.game_sense,
+        "nn_predictions": {
+            k: v for k, v in report.nn_predictions.items()
+            if k != "win_prob_samples"
+        },
+        "round_details": report.round_details,
+    }
+    try:
+        return generate_all_charts(data, models_dir, output_dir)
+    except Exception as e:
+        print(f"  Chart generation failed: {e}")
+        return []
 
 
 # ---------------------------------------------------------------------------
@@ -1712,5 +2096,11 @@ if __name__ == "__main__":
     report = generate_full_report(demo, player, mdir)
     print_report(report)
 
+    out_dir = "reports"
     out_name = Path(demo).stem + f"_{player}_report.json"
-    save_report_json(report, os.path.join("reports", out_name))
+    save_report_json(report, os.path.join(out_dir, out_name))
+
+    print("\nGenerating visualization charts...")
+    charts = generate_report_charts(report, out_dir, mdir)
+    for c in charts:
+        print(f"  Saved: {c}")
