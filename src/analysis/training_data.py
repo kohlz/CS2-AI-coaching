@@ -24,10 +24,6 @@ import sys
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "demo"))
 from callouts_mirage import get_zone, ZONES
 
-# ---------------------------------------------------------------------------
-# Constants
-# ---------------------------------------------------------------------------
-
 TICK_RATE = 64
 ZONE_TO_IDX = {z: i for i, z in enumerate(ZONES)}
 
@@ -87,10 +83,6 @@ def _team_str(team_num) -> str:
     return "?"
 
 
-# ---------------------------------------------------------------------------
-# Knife-round detection
-# ---------------------------------------------------------------------------
-
 def _is_knife_round(round_deaths_df: pd.DataFrame) -> bool:
     """Return True if this round looks like a knife/side-selection round."""
     if round_deaths_df is None or len(round_deaths_df) == 0:
@@ -122,10 +114,6 @@ def _knife_round_mask(parser: DemoParser, freeze_ends: list[int],
         mask.append(_is_knife_round(rd))
     return mask
 
-
-# ---------------------------------------------------------------------------
-# Round-level feature extraction  (for NN training)
-# ---------------------------------------------------------------------------
 
 def _safe_parse_event(parser: DemoParser, event_name: str, **kwargs) -> pd.DataFrame:
     """parse_event that always returns a DataFrame with a 'tick' column."""
@@ -427,10 +415,6 @@ def _extract_round_features(parser: DemoParser, demo_path: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# ---------------------------------------------------------------------------
-# RL time-step extraction  (for Q-learning)
-# ---------------------------------------------------------------------------
-
 def _extract_rl_transitions(parser: DemoParser, demo_path: str) -> pd.DataFrame:
     """Extract state-action-reward tuples sampled every 5 seconds per round."""
 
@@ -609,10 +593,6 @@ def _extract_rl_transitions(parser: DemoParser, demo_path: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# ---------------------------------------------------------------------------
-# RL v2: micro-decision extraction  (PEEK / HOLD / TRADE / FALL_BACK / UTILITY / ROTATE)
-# ---------------------------------------------------------------------------
-
 def _classify_action_v2(
     side: str, zone: str, next_zone: str,
     player_name: str, tick: int, next_tick: int,
@@ -759,10 +739,6 @@ def _classify_action_side_specific(
             return CT_ACTION_IDX["FALL_BACK"]
         return CT_ACTION_IDX["ROTATE"]
 
-
-# ---------------------------------------------------------------------------
-# CT formation label extraction (for FormationClassifier_CT LSTM)
-# ---------------------------------------------------------------------------
 
 # All valid formations per alive count
 CT_FORMATIONS_BY_ALIVE = {
@@ -1269,10 +1245,6 @@ def _extract_rl_v2(parser: DemoParser, demo_path: str) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
-# ---------------------------------------------------------------------------
-# Event sequence extraction  (for LSTM / sequence NN)
-# ---------------------------------------------------------------------------
-
 def _extract_event_sequences(parser: DemoParser, demo_path: str) -> list[dict]:
     """Extract time-ordered event sequences per round for sequence model training."""
     freeze_ends = sorted(_safe_parse_event(parser, "round_freeze_end")
@@ -1377,10 +1349,6 @@ def _extract_event_sequences(parser: DemoParser, demo_path: str) -> list[dict]:
     return results
 
 
-# ---------------------------------------------------------------------------
-# Batch extraction
-# ---------------------------------------------------------------------------
-
 def discover_demos(base_dir: str) -> list[str]:
     """Find all .dem files recursively under base_dir."""
     demos = glob.glob(os.path.join(base_dir, "**", "*.dem"), recursive=True)
@@ -1474,10 +1442,6 @@ def extract_all(
         "ct_formation_sequences": all_ct_formations,
     }
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     data = extract_all("src/demo")

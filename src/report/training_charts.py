@@ -28,18 +28,10 @@ MODEL_ORDER = [
 ]
 
 
-# --------------------------------------------------------------------------
-# Loading
-# --------------------------------------------------------------------------
-
 def load_results(path: str) -> dict:
     with open(path, "r", encoding="utf-8") as f:
         return json.load(f)
 
-
-# --------------------------------------------------------------------------
-# Terminal-log scraping (fallback when training_results.json lacks history)
-# --------------------------------------------------------------------------
 
 _EPOCH_PATTERNS = {
     "preround_formation":
@@ -110,10 +102,6 @@ def _get_history(results: dict, model_key: str,
     return ep, ls, ac
 
 
-# --------------------------------------------------------------------------
-# Chart 1 — accuracy comparison (grouped bar)
-# --------------------------------------------------------------------------
-
 def plot_accuracy(results: dict, out_path: str) -> None:
     nn = results.get("nn", {})
     test = results.get("test", {})
@@ -167,10 +155,6 @@ def plot_accuracy(results: dict, out_path: str) -> None:
     plt.close(fig)
 
 
-# --------------------------------------------------------------------------
-# Chart 2 — training loss curves
-# --------------------------------------------------------------------------
-
 def plot_loss_curves(results: dict, scraped: dict, out_path: str) -> None:
     fig, ax = plt.subplots(figsize=(9, 4.8), dpi=150)
 
@@ -202,10 +186,6 @@ def plot_loss_curves(results: dict, scraped: dict, out_path: str) -> None:
     fig.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
 
-
-# --------------------------------------------------------------------------
-# Chart 3 — Test-set metrics (Accuracy / Macro-F1 vs majority baseline)
-# --------------------------------------------------------------------------
 
 COLOR_F1 = "#6AA84F"
 COLOR_BASELINE = "#C0392B"
@@ -265,10 +245,6 @@ def plot_classifier_metrics(results: dict, out_path: str) -> None:
     plt.close(fig)
 
 
-# --------------------------------------------------------------------------
-# Chart 3b — Dedicated F1 score chart (Macro vs Weighted per model)
-# --------------------------------------------------------------------------
-
 COLOR_MACRO = "#6AA84F"
 COLOR_WEIGHTED = "#3D85C6"
 
@@ -317,10 +293,6 @@ def plot_f1_scores(results: dict, out_path: str) -> None:
     fig.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
 
-
-# --------------------------------------------------------------------------
-# Chart 3c — Per-class F1 breakdown
-# --------------------------------------------------------------------------
 
 def plot_per_class_f1(results: dict, out_path: str) -> None:
     """One subplot per classifier showing F1 for every class (shade = support)."""
@@ -399,10 +371,6 @@ def plot_per_class_f1(results: dict, out_path: str) -> None:
     plt.close(fig)
 
 
-# --------------------------------------------------------------------------
-# Chart 4 — Q-learner agreement
-# --------------------------------------------------------------------------
-
 def plot_ql_agreement(results: dict, out_path: str) -> None:
     ql = results.get("ql", {})
     test = results.get("test", {})
@@ -453,10 +421,6 @@ def plot_ql_agreement(results: dict, out_path: str) -> None:
     fig.savefig(out_path, bbox_inches="tight")
     plt.close(fig)
 
-
-# --------------------------------------------------------------------------
-# CLI
-# --------------------------------------------------------------------------
 
 def _find_default_log() -> str | None:
     """Pick the most recent training terminal log in the Cursor terminals dir."""

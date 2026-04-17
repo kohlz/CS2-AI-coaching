@@ -19,9 +19,6 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 
-# ---------------------------------------------------------------------------
-# Device selection
-# ---------------------------------------------------------------------------
 
 def get_device() -> torch.device:
     if torch.cuda.is_available():
@@ -31,10 +28,6 @@ def get_device() -> torch.device:
 
 DEVICE = get_device()
 
-
-# ===========================================================================
-# 1. Pre-Round Formation Predictor (Feedforward NN)
-# ===========================================================================
 
 FORMATION_CLASSES = ["2-1-2", "1-2-2", "1-1-3", "2-2-1", "3-1-1",
                      "1-1-2", "0-2-3", "2-0-3", "other"]
@@ -216,10 +209,6 @@ class PreRoundFormation:
                 for i in range(len(FORMATION_CLASSES))}
 
 
-# ===========================================================================
-# 1b. Pre-Round Attack Predictor (Feedforward NN)
-# ===========================================================================
-
 ATTACK_SITE_CLASSES = ["A", "B", "no_plant"]
 ATTACK_SITE_TO_IDX = {c: i for i, c in enumerate(ATTACK_SITE_CLASSES)}
 
@@ -290,10 +279,6 @@ class PreRoundAttack(PreRoundFormation):
         return {ATTACK_SITE_CLASSES[i]: float(probs[i])
                 for i in range(len(ATTACK_SITE_CLASSES))}
 
-
-# ===========================================================================
-# 2. FormationClassifier_T (LSTM) — Where T Is Attacking
-# ===========================================================================
 
 N_EVENT_TYPES = 6   # kill, smoke, flash, he, plant, molotov
 N_SEQ_ZONES = 5     # A, B, MID, CT_BASE, T_BASE
@@ -482,10 +467,6 @@ class FormationClassifier_T:
                 "loss_history": loss_history,
                 "acc_history": acc_history}
 
-
-# ===========================================================================
-# 3. FormationClassifier_CT (LSTM, alive-aware masking)
-# ===========================================================================
 
 # Import formation constants from training_data
 try:
@@ -746,10 +727,6 @@ class FormationClassifier_CT:
                 "acc_history": acc_history}
 
 
-# ===========================================================================
-# Backward compatibility aliases
-# ===========================================================================
-
 EventSequencePredictor = FormationClassifier_T
 
 # Stub classes so old model files don't crash on load
@@ -769,10 +746,6 @@ class FormationClassifier:
         self.trained = False
         self.model = nn.Sequential(nn.Linear(7, len(FORMATION_CLASSES)))
 
-
-# ---------------------------------------------------------------------------
-# Save / Load
-# ---------------------------------------------------------------------------
 
 def save_models(models: dict, save_dir: str = "models") -> None:
     os.makedirs(save_dir, exist_ok=True)
@@ -840,10 +813,6 @@ def load_models(save_dir: str = "models") -> dict:
 
     return models
 
-
-# ---------------------------------------------------------------------------
-# Train all from demo data
-# ---------------------------------------------------------------------------
 
 _PRIOR_COLS_PASSTHROUGH = [
     "prev_plant_A", "prev_plant_B", "prev_plant_none", "prev_no_history",
@@ -1018,7 +987,6 @@ def train_all_models(
     models = {}
     all_stats = {}
 
-    # ── PreRoundFormation ──
     prf_df = _build_prf_df(df)
     prf_val_df = _build_prf_df(val_data["rounds"]) if val_data and not val_data["rounds"].empty else None
 
@@ -1039,7 +1007,6 @@ def train_all_models(
         print(f"  Final: loss={stats_prf['final_loss']:.4f}, "
               f"acc={stats_prf['accuracy']:.1%}\n")
 
-    # ── PreRoundAttack ──
     pra_df = _build_pra_df(df)
     pra_val_df = _build_pra_df(val_data["rounds"]) if val_data and not val_data["rounds"].empty else None
 
@@ -1060,7 +1027,6 @@ def train_all_models(
         print(f"  Final: loss={stats_pra['final_loss']:.4f}, "
               f"acc={stats_pra['accuracy']:.1%}\n")
 
-    # ── FormationClassifier_T (LSTM) ──
     if verbose:
         print("--- FormationClassifier_T (LSTM) ---")
     fc_t = FormationClassifier_T()
@@ -1083,7 +1049,6 @@ def train_all_models(
             print("  No event sequences available for training.\n")
     models["formation_classifier_t"] = fc_t
 
-    # ── FormationClassifier_CT (LSTM, alive-aware) ──
     if verbose:
         print("--- FormationClassifier_CT (LSTM, alive-aware) ---")
     fc_ct = FormationClassifier_CT()
@@ -1166,10 +1131,6 @@ def _eval_lstm_ct(fc_ct: FormationClassifier_CT,
             total += 1
     return correct / max(total, 1)
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     result = train_all_models()

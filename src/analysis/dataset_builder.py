@@ -218,10 +218,6 @@ def build_and_save_datasets(
     return split_info
 
 
-# ---------------------------------------------------------------------------
-# Load saved datasets
-# ---------------------------------------------------------------------------
-
 def load_split(output_dir: str = "data",
                split_name: str = "train") -> dict:
     """Load a previously saved dataset split from disk.
@@ -265,10 +261,6 @@ def load_split_info(output_dir: str = "data") -> dict:
             return json.load(f)
     return {}
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     demo_dir = sys.argv[1] if len(sys.argv) > 1 else "src/demo/train_demos"

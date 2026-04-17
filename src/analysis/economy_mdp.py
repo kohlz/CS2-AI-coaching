@@ -23,10 +23,6 @@ from info_model import (
     loss_bonus, next_money_win, next_money_loss,
 )
 
-# ---------------------------------------------------------------------------
-# MDP Configuration
-# ---------------------------------------------------------------------------
-
 MONEY_STEP = 500
 N_MONEY_BINS = MONEY_CAP // MONEY_STEP + 1
 N_STREAKS = MAX_LOSS_STREAK + 1
@@ -71,10 +67,6 @@ VI_EPSILON = 1e-6
 VI_MAX_ITER = 500
 
 
-# ---------------------------------------------------------------------------
-# Helper functions
-# ---------------------------------------------------------------------------
-
 def _money_to_bin(money: int) -> int:
     return min(max(0, money // MONEY_STEP), N_MONEY_BINS - 1)
 
@@ -97,19 +89,11 @@ def _opponent_equip_dist(enemy_loss_streak: int) -> np.ndarray:
     return distributions[k]
 
 
-# ---------------------------------------------------------------------------
-# MDP Transition Model
-# ---------------------------------------------------------------------------
-
 def _expected_win_prob(side: str, my_tier: int, enemy_loss_streak: int) -> float:
     """Expected win probability given my equipment tier and enemy loss streak."""
     opp_dist = _opponent_equip_dist(enemy_loss_streak)
     return float(WIN_PROB[side][my_tier] @ opp_dist)
 
-
-# ---------------------------------------------------------------------------
-# Value Iteration
-# ---------------------------------------------------------------------------
 
 @dataclass
 class EconomyPolicy:
@@ -196,10 +180,6 @@ def solve_economy_mdp(side: str, gamma: float = GAMMA) -> EconomyPolicy:
     return EconomyPolicy(side=side, V=V, policy=policy)
 
 
-# ---------------------------------------------------------------------------
-# Player Buy-Decision Classifier
-# ---------------------------------------------------------------------------
-
 # Rifles / snipers that indicate a full buy
 _FULL_BUY_PRIMARIES = {
     "AK-47", "M4A4", "M4A1-S", "SG 553", "AUG", "AWP",
@@ -239,10 +219,6 @@ def classify_buy_decision(
     return SAVE
 
 
-# ---------------------------------------------------------------------------
-# Round-by-Round Evaluation
-# ---------------------------------------------------------------------------
-
 @dataclass
 class BuyEvaluation:
     """Evaluation of a single round's buy decision."""
@@ -275,10 +251,6 @@ class BuyEvaluation:
     upgrade_path_note: str = ""
     posthoc: Optional[PostHocDetail] = None
 
-
-# ---------------------------------------------------------------------------
-# Post-hoc evaluation layer (weapon / armor / utility / kit / waste)
-# ---------------------------------------------------------------------------
 
 @dataclass
 class PostHocDetail:
@@ -421,10 +393,6 @@ def _predict_enemy_buy(enemy_loss_streak: int,
         return f"Enemy lost {enemy_loss_streak} — loss bonus allows FULL BUY"
     return ""
 
-
-# ---------------------------------------------------------------------------
-# Enhanced evaluation helpers (weapon matchup, team trajectory, upgrade path)
-# ---------------------------------------------------------------------------
 
 _WEAPON_TIER = {
     "AK-47": "rifle", "M4A4": "rifle", "M4A1-S": "rifle",
@@ -819,10 +787,6 @@ def economy_summary(evaluations: list[BuyEvaluation]) -> dict:
         "no_util_on_fullbuy": no_util_on_fullbuy,
     }
 
-
-# ---------------------------------------------------------------------------
-# Debug / CLI
-# ---------------------------------------------------------------------------
 
 def print_policy(policy: EconomyPolicy, enemy_streaks: list[int] | None = None) -> None:
     """Print the optimal policy as readable tables.

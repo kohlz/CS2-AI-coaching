@@ -21,10 +21,6 @@ TICK_RATE = 64
 TRADE_WINDOW_SEC = 5.0
 
 
-# ---------------------------------------------------------------------------
-# Data classes
-# ---------------------------------------------------------------------------
-
 @dataclass
 class RoundEngagement:
     """Engagement metrics for one round."""
@@ -52,10 +48,6 @@ class RoundEngagement:
 
     notes: list[str] = field(default_factory=list)
 
-
-# ---------------------------------------------------------------------------
-# Core analysis
-# ---------------------------------------------------------------------------
 
 def _distance_2d(x1, y1, x2, y2) -> float:
     return math.sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
@@ -99,7 +91,6 @@ def analyze_engagement(
             results.append(eng)
             continue
 
-        # --- Opening duel ---
         first_kill = kill_events[0]
         if first_kill.data.get("attacker") == target_player:
             eng.is_opening_kill = True
@@ -108,12 +99,10 @@ def analyze_engagement(
             eng.is_opening_death = True
             eng.notes.append("Lost opening duel")
 
-        # --- Multi-kill ---
         if p.kills >= 2:
             eng.multi_kill = p.kills
             eng.notes.append(f"{p.kills}K round")
 
-        # --- Trade analysis ---
         teammates = (
             [pl.name for pl in rd.t_players if pl.name != target_player]
             if p.side == "T" else
@@ -142,7 +131,6 @@ def analyze_engagement(
             if not traded:
                 eng.untraded_teammate_deaths += 1
 
-        # --- Was the target's death traded? ---
         if p.deaths > 0 and p.death_tick is not None:
             traded_back = False
             enemy_names = set(
@@ -159,7 +147,6 @@ def analyze_engagement(
                 eng.was_isolated_death = True
                 eng.notes.append("Died without trade")
 
-        # --- Clutch detection ---
         if p.side in ("T", "CT"):
             my_team = rd.t_players if p.side == "T" else rd.ct_players
             enemy_team = rd.ct_players if p.side == "T" else rd.t_players
@@ -191,10 +178,6 @@ def analyze_engagement(
 
     return results
 
-
-# ---------------------------------------------------------------------------
-# Summary
-# ---------------------------------------------------------------------------
 
 def engagement_summary(evaluations: list[RoundEngagement]) -> dict:
     """Aggregate engagement stats into a summary dict."""

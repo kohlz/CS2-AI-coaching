@@ -16,10 +16,6 @@ import pandas as pd
 from demoparser2 import DemoParser
 
 
-# ---------------------------------------------------------------------------
-# Data classes
-# ---------------------------------------------------------------------------
-
 TICK_RATE = 64
 
 
@@ -117,14 +113,6 @@ class MatchData:
         return p.side if p else "unknown"
 
 
-# ---------------------------------------------------------------------------
-# Team number mapping
-# ---------------------------------------------------------------------------
-
-# ---------------------------------------------------------------------------
-# Weapon / item classification
-# ---------------------------------------------------------------------------
-
 PRIMARY_WEAPONS = {
     # Rifles
     "AK-47", "M4A4", "M4A1-S", "SG 553", "AUG", "Galil AR", "FAMAS",
@@ -193,10 +181,6 @@ def _team_str(team_num: int | float) -> str:
     return "unknown"
 
 
-# ---------------------------------------------------------------------------
-# Main parse function
-# ---------------------------------------------------------------------------
-
 def parse_demo(demo_path: str, target_player: str) -> MatchData:
     """Parse a CS2 demo file and return structured match data.
 
@@ -210,7 +194,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
     parser = DemoParser(demo_path)
     header = parser.parse_header()
 
-    # ── Player info ──────────────────────────────────────────────────
     player_info = parser.parse_player_info()
     players = {}
     target_steamid = None
@@ -228,7 +211,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
             f"Available players: {available}"
         )
 
-    # ── Events ───────────────────────────────────────────────────────
     deaths = parser.parse_event(
         "player_death",
         player=["X", "Y", "Z", "team_num"],
@@ -295,7 +277,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
         parser.parse_event("buytime_ended")["tick"].tolist()
     )
 
-    # ── Tick data at round boundaries (for economy) ──────────────────
     economy_ticks = []
     for fe_tick in freeze_ends:
         economy_ticks.append(fe_tick)
@@ -308,7 +289,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
         ticks=economy_ticks,
     )
 
-    # ── Inventory snapshot at buytime_ended (post-buy loadout) ────────
     inv_df = None
     if buytime_ended_ticks:
         inv_df = parser.parse_ticks(
@@ -317,7 +297,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
             ticks=buytime_ended_ticks,
         )
 
-    # ── Position snapshots (sample every 2 seconds during rounds) ────
     position_ticks = []
     for i, fe_tick in enumerate(freeze_ends):
         end_tick = round_ends[i] if i < len(round_ends) else fe_tick + 115 * TICK_RATE
@@ -332,7 +311,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
         ticks=position_ticks,
     )
 
-    # ── Build rounds ─────────────────────────────────────────────────
     n_rounds = min(len(freeze_ends), len(round_ends))
     match = MatchData(
         map_name=header.get("map_name", "unknown"),
@@ -393,10 +371,6 @@ def parse_demo(demo_path: str, target_player: str) -> MatchData:
     return match
 
 
-# ---------------------------------------------------------------------------
-# Round builder
-# ---------------------------------------------------------------------------
-
 def _build_round(
     round_num: int,
     tick_freeze_end: int,
@@ -431,7 +405,6 @@ def _build_round(
     rd_hes = _in_round(he_grenades)
     rd_molotovs = _in_round(molotovs)
 
-    # ── Economy snapshot at freeze end ───────────────────────────────
     econ_snap = econ_df[econ_df["tick"] == fe_tick]
 
     t_players: dict[str, PlayerRound] = {}
@@ -454,7 +427,6 @@ def _build_round(
         elif side == "CT":
             ct_players[name] = pr
 
-    # ── Inventory snapshot at buytime_ended (post-buy loadout) ───────
     if inv_df is not None and bt_tick is not None:
         inv_snap = inv_df[inv_df["tick"] == bt_tick]
         for _, row in inv_snap.iterrows():
@@ -479,7 +451,6 @@ def _build_round(
                     pr.has_helmet = loadout["has_helmet"]
                     pr.armor = loadout["armor"]
 
-    # ── Events timeline ──────────────────────────────────────────────
     events: list[GameEvent] = []
 
     for _, row in rd_deaths.iterrows():
@@ -593,7 +564,6 @@ def _build_round(
 
     events.sort(key=lambda e: e.tick)
 
-    # ── Positions (sampled every 2s) ─────────────────────────────────
     rd_pos = pos_df[
         (pos_df["tick"] >= fe_tick) & (pos_df["tick"] <= tick_end)
     ]
@@ -612,7 +582,6 @@ def _build_round(
             if name in pool:
                 pool[name].positions.append(pos)
 
-    # ── Determine round winner ───────────────────────────────────────
     if bomb_exploded:
         winner, win_reason = "T", "bomb_explode"
     elif bomb_defused:
@@ -640,10 +609,6 @@ def _build_round(
         bomb_site=bomb_site,
     )
 
-
-# ---------------------------------------------------------------------------
-# CLI: quick demo inspection
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import sys

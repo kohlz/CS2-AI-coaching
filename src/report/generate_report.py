@@ -25,10 +25,6 @@ sys.path.insert(0, str(PROJECT_ROOT / "src" / "analysis"))
 sys.path.insert(0, str(PROJECT_ROOT / "src" / "report"))
 
 
-# ---------------------------------------------------------------------------
-# Imports from project modules
-# ---------------------------------------------------------------------------
-
 from demo_parser import parse_demo, MatchData
 from callouts_mirage import get_zone
 from economy_mdp import evaluate_player_economy, economy_summary
@@ -64,10 +60,6 @@ except ImportError:
     pass
 
 
-# ---------------------------------------------------------------------------
-# Report data class
-# ---------------------------------------------------------------------------
-
 @dataclass
 class CoachingReport:
     """Complete coaching report for one demo."""
@@ -87,10 +79,6 @@ class CoachingReport:
 
     generation_time_sec: float = 0.0
 
-
-# ---------------------------------------------------------------------------
-# Coaching tip generator
-# ---------------------------------------------------------------------------
 
 def _generate_tips(econ: dict, eng: dict, _gs=None) -> list[str]:
     """Generate natural-language coaching tips from summary stats."""
@@ -164,10 +152,6 @@ def _generate_tips(econ: dict, eng: dict, _gs=None) -> list[str]:
 
     return tips
 
-
-# ---------------------------------------------------------------------------
-# NN round-level predictions
-# ---------------------------------------------------------------------------
 
 def _resolve_bomb_site(rd) -> str:
     """Return the bomb site as 'A' or 'B' for a round, or 'no_plant'/'unknown'."""
@@ -360,12 +344,7 @@ def _run_nn_predictions(match: MatchData, models: dict,
     return predictions
 
 
-# ---------------------------------------------------------------------------
-# Per-round suggestion templates
-# ---------------------------------------------------------------------------
-
 TEMPLATES = {
-    # ── Economy ──────────────────────────────────────────────────────
     "eco_over_buy": (
         "Over-bought (did {action} at ${money}, optimal was {optimal}). "
         "Save this round to guarantee a full buy next round."),
@@ -380,7 +359,6 @@ TEMPLATES = {
     "eco_enemy_full_buy": (
         "{enemy_pred} — play default setup, use all your utility."),
 
-    # ── Engagement ───────────────────────────────────────────────────
     "opening_kill": (
         "Great opening frag — first blood gives your team a huge advantage."),
     "opening_death": (
@@ -404,7 +382,6 @@ TEMPLATES = {
         "Only {damage} damage this round. "
         "Look for opportunities to deal more damage through utility or repositioning."),
 
-    # ── Game Sense (CT-side) ─────────────────────────────────────────
     "gs_correct": (
         "Good game sense — you read the {zone} attack correctly "
         "({prob:.0%} belief) and were in position."),
@@ -417,7 +394,6 @@ TEMPLATES = {
         "could rotate — avoid early aggressive peeks when you need to "
         "anchor a site."),
 
-    # ── NN-driven predictions ───────────────────────────────────────
     "nn_win_ct_favored": (
         "[NN] Round win probability: {p_win:.0%} for your side (CT favored) — "
         "you have economy/position advantage, play default and use utility."),
@@ -460,17 +436,14 @@ TEMPLATES = {
         "[NN] CT formation unclear — play default and read "
         "their setup from utility/positions."),
 
-    # ── LSTM dynamic prediction ──────────────────────────────────────
     "lstm_prediction": (
         "[LSTM @ {time}s] After {n_events} events: "
         "A={a_prob:.0%}, B={b_prob:.0%} → {interpretation}"),
 
-    # ── CT Formation LSTM dynamic prediction (T-side only) ─────────
     "lstm_ct_formation": (
         "[Formation] CT running {formation} ({confidence:.0%}) — "
         "{formation_advice}"),
 
-    # ── RL tactical suggestion (micro-decision) ─────────────────────
     "rl_suggest": (
         "[Q-learning] {state_desc} → recommended: {rl_action}."),
     "rl_ss_suggest": (
@@ -486,7 +459,6 @@ TEMPLATES = {
         "[Q-learning v2] Using utility here has high strategic value "
         "(win-Q: {win_q:+.2f}). Smoke or flash before committing."),
 
-    # ── General ──────────────────────────────────────────────────────
     "clean_win": "Clean round win. Keep it up.",
     "tough_loss": "Tough loss — nothing specific to change here.",
     "pistol_round": (
@@ -552,7 +524,6 @@ def _suggest_for_round(
     if is_pistol:
         pre_round.append(TEMPLATES["pistol_round"])
 
-    # ── Economy suggestions ──────────────────────────────────────────
     if econ_eval is not None:
         money = econ_eval.money
         action = econ_eval.actual_name
@@ -586,7 +557,6 @@ def _suggest_for_round(
         if econ_eval.upgrade_path_note:
             pre_round.append(f"[Upgrade] {econ_eval.upgrade_path_note}")
 
-    # ── Engagement suggestions ───────────────────────────────────────
     if eng_eval is not None:
         if eng_eval.is_opening_kill:
             pre_round.append(TEMPLATES["opening_kill"])
@@ -613,7 +583,6 @@ def _suggest_for_round(
         elif kills == 0 and 0 < damage < 50:
             pre_round.append(TEMPLATES["low_impact"].format(damage=damage))
 
-    # ── NN round-start predictions ───────────────────────────────────
     if nn_round is not None:
         wp = nn_round.get("win_prob")
         if wp is not None:
@@ -686,7 +655,6 @@ def _suggest_for_round(
             else:
                 pre_round.append(TEMPLATES["nn_ct_formation_uncertain"])
 
-    # ── Build merged event timeline (LSTM + RL) ──────────────────────
     timeline: list[dict] = []
 
     if lstm_preds:
@@ -780,7 +748,6 @@ def _suggest_for_round(
 
     timeline.sort(key=lambda e: (e["time_sec"], e["tick"]))
 
-    # ── Outcome line ─────────────────────────────────────────────────
     outcome = "Round won." if won else "Round lost."
     if kills > 0:
         outcome += f" You had {kills}K {damage}DMG."
@@ -789,7 +756,6 @@ def _suggest_for_round(
     else:
         outcome += " No impact this round."
 
-    # ── Fallback ─────────────────────────────────────────────────────
     if not pre_round and not timeline:
         pre_round.append(
             TEMPLATES["clean_win"] if won else TEMPLATES["tough_loss"])
@@ -800,10 +766,6 @@ def _suggest_for_round(
         "outcome": outcome,
     }
 
-
-# ---------------------------------------------------------------------------
-# Round detail builder
-# ---------------------------------------------------------------------------
 
 ZONE_TO_IDX = {"A": 0, "B": 1, "MID": 2, "CT_BASE": 3, "T_BASE": 4}
 
@@ -1090,8 +1052,6 @@ def _get_rl_v2_suggestion(rd, target_player: str, q_v2) -> Optional[dict]:
         return None
 
 
-# ── RL v2 event-driven timeline ──────────────────────────────────────
-
 _V2_LABELS = {
     ("CT", False): {
         "PEEK": "Push for info or an aggressive peek",
@@ -1249,8 +1209,6 @@ def _get_rl_v2_timeline(rd, target_player: str, q_v2, events=None) -> list[dict]
 
     return timeline
 
-
-# ── Side-specific RL event-driven timeline ────────────────────────────
 
 _SS_LABELS = {
     ("CT", False): {
@@ -1433,8 +1391,6 @@ def _get_ss_rl_timeline(rd, target_player: str, ql_model,
 
     return timeline
 
-
-# ── CT formation LSTM predictions (for T-side rounds) ────────────────
 
 def _get_ct_formation_predictions(rd, fc_ct_model, events=None,
                                   prior: list[float] | None = None) -> list[dict]:
@@ -1755,10 +1711,6 @@ def _build_round_details(
     return details
 
 
-# ---------------------------------------------------------------------------
-# Main report generator
-# ---------------------------------------------------------------------------
-
 def generate_full_report(
     demo_path: str,
     target_player: str,
@@ -1878,10 +1830,6 @@ def generate_full_report(
 
     return report
 
-
-# ---------------------------------------------------------------------------
-# Pretty-print report
-# ---------------------------------------------------------------------------
 
 def print_report(report: CoachingReport) -> None:
     """Print a human-readable coaching report to stdout."""
@@ -2018,10 +1966,6 @@ def print_report(report: CoachingReport) -> None:
     print()
 
 
-# ---------------------------------------------------------------------------
-# Save report to JSON
-# ---------------------------------------------------------------------------
-
 def save_report_json(report: CoachingReport, output_path: str) -> dict:
     """Save the report as a JSON file and return the serialized dict."""
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
@@ -2079,10 +2023,6 @@ def generate_report_charts(report: CoachingReport,
         print(f"  Chart generation failed: {e}")
         return []
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     if len(sys.argv) < 3:

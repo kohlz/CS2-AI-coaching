@@ -11,10 +11,6 @@ import math
 from dataclasses import dataclass, field
 from typing import Optional
 
-# ===========================================================================
-# CS2 Economy Constants
-# ===========================================================================
-
 MONEY_CAP = 16_000
 STARTING_MONEY = 800
 
@@ -52,10 +48,6 @@ T_PLANT_RATE_ON_LOSS = 0.35  # bomb planted in ~35% of T round losses
 CT_KILL_BONUS_WIN = 200      # ~4 T kills * $50
 CT_KILL_BONUS_LOSS = 75      # ~1.5 T kills * $50
 
-
-# ---------------------------------------------------------------------------
-# Economy helper functions (shared by HMM + MDP)
-# ---------------------------------------------------------------------------
 
 def loss_bonus(streak: int) -> int:
     """Loss bonus received after accumulating ``streak`` consecutive losses."""
@@ -106,10 +98,6 @@ def money_to_tier(money: float) -> str:
     return "RICH"
 
 
-# ---------------------------------------------------------------------------
-# Economy tiers
-# ---------------------------------------------------------------------------
-
 ECON_TIERS = ["BROKE", "LOW", "MEDIUM", "HIGH", "RICH"]
 TIER_IDX = {t: i for i, t in enumerate(ECON_TIERS)}
 N_TIERS = len(ECON_TIERS)
@@ -131,10 +119,6 @@ TIER_AVG_MONEY = {
 }
 
 
-# ---------------------------------------------------------------------------
-# Round observation — extracted from previous round
-# ---------------------------------------------------------------------------
-
 @dataclass
 class EconObservation:
     """Observation from the previous round used to predict current enemy economy."""
@@ -145,10 +129,6 @@ class EconObservation:
     enemy_loss_streak: int    # 0-5+
     enemy_win_streak: int     # 0-5+
 
-
-# ---------------------------------------------------------------------------
-# Transition model: P(tier_t | tier_{t-1}, enemy_won_prev)
-# ---------------------------------------------------------------------------
 
 def _derive_transition_matrix() -> dict[str, dict[bool, dict[str, float]]]:
     """Build P(next_tier | current_tier, enemy_won_previous_round)."""
@@ -189,10 +169,6 @@ def _derive_transition_matrix() -> dict[str, dict[bool, dict[str, float]]]:
 
 TRANSITION = _derive_transition_matrix()
 
-
-# ---------------------------------------------------------------------------
-# Emission model: P(observation features | economy tier)
-# ---------------------------------------------------------------------------
 
 _WEAPON_EMISSION = {
     "BROKE":  {"pistol": 0.75, "smg": 0.10, "rifle": 0.05, "awp": 0.01, "unknown": 0.09},
@@ -265,10 +241,6 @@ def _emission_prob(obs: EconObservation, tier: str) -> float:
     return max(p, 1e-12)
 
 
-# ---------------------------------------------------------------------------
-# Economy HMM inference
-# ---------------------------------------------------------------------------
-
 def _normalize(belief: dict[str, float]) -> dict[str, float]:
     s = sum(max(v, 0.0) for v in belief.values())
     if s < 1e-12:
@@ -330,10 +302,6 @@ class EconomyHMM:
             "predicted_avg_money": int(avg_money),
         }
 
-
-# ---------------------------------------------------------------------------
-# Helper: classify round end type from match data
-# ---------------------------------------------------------------------------
 
 def classify_round_end(rd, enemy_side: str) -> str:
     """Determine how a round ended from the perspective of the enemy team.
@@ -421,10 +389,6 @@ def count_enemy_survivors(rd, enemy_side: str) -> int:
     else:
         return sum(1 for p in rd.ct_players if p.alive_at_end)
 
-
-# ---------------------------------------------------------------------------
-# Build observations from match data
-# ---------------------------------------------------------------------------
 
 def build_economy_observations(
     rounds: list,

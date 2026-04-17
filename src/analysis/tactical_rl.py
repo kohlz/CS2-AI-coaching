@@ -14,10 +14,6 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-# ---------------------------------------------------------------------------
-# Legacy state/action spaces (backward compat)
-# ---------------------------------------------------------------------------
-
 N_T_ALIVE = 6
 N_CT_ALIVE = 6
 N_BOMB_STATUS = 3
@@ -37,10 +33,6 @@ def _state_index(t_alive, ct_alive, bomb, time_b, zone):
     return (min(t_alive, 5), min(ct_alive, 5),
             min(bomb, 2), min(time_b, 3), min(zone, 4))
 
-
-# ---------------------------------------------------------------------------
-# Legacy V2 state/action spaces (backward compat)
-# ---------------------------------------------------------------------------
 
 N_SIDE = 2
 N_ALIVE_ADV = 7
@@ -62,10 +54,6 @@ def _v2_state_index(side_idx, alive_adv, bomb, time_b, zone, recent):
             min(max(zone, 0), 4),
             min(max(recent, 0), 4))
 
-
-# ===========================================================================
-# New side-specific Q-learner state/action spaces
-# ===========================================================================
 
 N_ALIVE_ADV_SS = 7
 N_BOMB_SS = 3
@@ -90,10 +78,6 @@ def _ss_state_index(alive_adv, bomb, time_b, zone, recent, team_support):
             min(max(recent, 0), 4),
             min(max(team_support, 0), 2))
 
-
-# ===========================================================================
-# Side-specific dual Q-learner
-# ===========================================================================
 
 class _SideQLearner:
     """Dual Q-table learner for one side (T or CT).
@@ -251,10 +235,6 @@ class TacticalQLearner_CT(_SideQLearner):
     def __init__(self, **kwargs):
         super().__init__("CT", **kwargs)
 
-
-# ===========================================================================
-# Legacy classes (backward compat, kept for load/report)
-# ===========================================================================
 
 class TacticalQLearner:
     """Legacy tabular Q-learning (v1)."""
@@ -493,10 +473,6 @@ class TacticalQLearnerV2:
         self.trained = True
 
 
-# ---------------------------------------------------------------------------
-# Training entrypoint for new side-specific models
-# ---------------------------------------------------------------------------
-
 def _eval_ql(learner: _SideQLearner, df: pd.DataFrame) -> dict:
     """Evaluate a Q-learner on held-out data.
 
@@ -706,10 +682,6 @@ def tune_ql_hyperparameters(train_data: dict, val_data: dict,
 
     return {"best": best_params, "trials": trials}
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     stats = train_side_specific("src/demo", n_passes=50)

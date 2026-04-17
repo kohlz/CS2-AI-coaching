@@ -60,7 +60,6 @@ def stage_train(data_dir: str = "data",
     results = {}
     os.makedirs(model_dir, exist_ok=True)
 
-    # ── Neural Networks ──
     if verbose:
         print("=" * 60)
         print("  [2/4] Training Neural Networks")
@@ -79,7 +78,6 @@ def stage_train(data_dir: str = "data",
     results["nn"] = nn_result.get("stats", {})
     results["nn"]["train_time_s"] = nn_time
 
-    # ── Q-Learner Hyperparameter Tuning ──
     if verbose:
         print()
         print("=" * 60)
@@ -100,7 +98,6 @@ def stage_train(data_dir: str = "data",
     best_passes = best.get("n_passes", 50)
     best_alpha = best.get("alpha_lr", 0.1)
 
-    # ── Q-Learners: retrain with best hyperparams ──
     if verbose:
         print()
         print("=" * 60)
@@ -127,7 +124,6 @@ def stage_train(data_dir: str = "data",
         "n_passes": best_passes, "alpha_lr": best_alpha,
     }
 
-    # ── Test set evaluation ──
     if verbose:
         print()
         print("=" * 60)
@@ -138,7 +134,6 @@ def stage_train(data_dir: str = "data",
     test_results = _evaluate_all(model_dir, test_data, verbose=verbose)
     results["test"] = test_results
 
-    # ── Summary ──
     summary_path = os.path.join(data_dir, "training_results.json")
     with open(summary_path, "w", encoding="utf-8") as f:
         json.dump(_make_serializable(results), f, indent=2)
@@ -326,10 +321,6 @@ def _make_serializable(obj):
         return obj.tolist()
     return obj
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 def main():
     if len(sys.argv) < 2:

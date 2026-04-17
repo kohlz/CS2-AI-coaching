@@ -27,10 +27,6 @@ except ImportError:
     _MPL_AVAILABLE = False
 
 
-# ---------------------------------------------------------------------------
-# Helper: extract LSTM final prediction and actual site per round
-# ---------------------------------------------------------------------------
-
 def _extract_lstm_accuracy(report: dict) -> tuple[list, list]:
     """Return (predicted_sites, actual_sites) for rounds with LSTM data."""
     predicted = []
@@ -79,10 +75,6 @@ def _extract_lstm_accuracy(report: dict) -> tuple[list, list]:
 
     return predicted, actual
 
-
-# ---------------------------------------------------------------------------
-# Model accuracy charts
-# ---------------------------------------------------------------------------
 
 def plot_lstm_accuracy(report: dict, output_dir: str) -> str | None:
     """Plot LSTM prediction accuracy: final prediction vs actual bomb site."""
@@ -244,10 +236,6 @@ def plot_ql_coverage(models_dir: str, output_dir: str) -> str | None:
     plt.close(fig)
     return path
 
-
-# ---------------------------------------------------------------------------
-# Fun fact charts
-# ---------------------------------------------------------------------------
 
 def plot_economy_flow(report: dict, output_dir: str) -> str | None:
     """Plot player money over rounds with buy decision annotations."""
@@ -482,10 +470,6 @@ def plot_utility_usage(report: dict, output_dir: str) -> str | None:
     return path
 
 
-# ---------------------------------------------------------------------------
-# Generate all charts
-# ---------------------------------------------------------------------------
-
 def generate_all_charts(report: dict, models_dir: str = "models",
                         output_dir: str = "reports") -> list[str]:
     """Generate all visualization charts and return list of saved file paths."""
@@ -524,10 +508,6 @@ def generate_all_charts(report: dict, models_dir: str = "models",
 
     return paths
 
-
-# ---------------------------------------------------------------------------
-# CLI
-# ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     import json

@@ -9,10 +9,8 @@ POMDP / HMM models.
 from __future__ import annotations
 from typing import Optional
 
-# ---------------------------------------------------------------------------
 # Callout definitions: (x_min, x_max, y_min, y_max)
 # Ordered from most specific to least specific.
-# ---------------------------------------------------------------------------
 
 CALLOUTS: list[tuple[str, tuple[float, float, float, float]]] = [
     # ── B site area (positive Y, upper portion of radar) ─────────────
@@ -104,10 +102,6 @@ def get_callout_center(name: str) -> Optional[tuple[float, float]]:
             return ((x_min + x_max) / 2, (y_min + y_max) / 2)
     return None
 
-
-# ---------------------------------------------------------------------------
-# Validation helper
-# ---------------------------------------------------------------------------
 
 def coverage_report(positions: list[tuple[float, float]]) -> dict[str, int]:
     """Count how many positions map to each callout."""
